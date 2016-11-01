@@ -238,7 +238,7 @@ alias .4='.3 && .1'
 alias .5='.4 && .1'
 
 # add colors for filetype and human-readable sizes by default on `ls`
-alias ls='ls -h --color'
+alias ls='ls -h --color --show-control-chars'
 alias lx='ls -lXB'	# sort by extension
 alias lk='ls -lSr'	# sort by date, biggest last
 alias lt='ls -ltr'	# sort by date, most recent last
