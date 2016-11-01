@@ -189,7 +189,7 @@ function _exit {
 	# for some reason, this doesn't respect our alias...
 	# must explicitly add `-e` flag for colors to be shown
 	echo -e "${BCyan}Bye!${NC}"
-	sleep 1
+	sleep 0.5
 }
 trap _exit EXIT
 
