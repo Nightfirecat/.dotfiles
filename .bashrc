@@ -30,12 +30,12 @@ shopt -s hostcomplete
 shopt -s interactive_comments
 shopt -s no_empty_cmd_completion
 shopt -s nocaseglob
-shopt -s nullglob
 shopt -s progcomp
 shopt -s promptvars
 shopt -s sourcepath
 
 shopt -u mailwarn
+shopt -u nullglob	# `ls nonexist/*` should fail, not act like `ls`
 #unset MAILCHECK	# don't want shell to warn me of incoming mail
 
 # bash time/hist/host file and formatting vars exported after color vars
