@@ -255,7 +255,6 @@ alias la='ll -A'	# show hidden files
 alias tree='tree -Csuh'	# nice alternative to recursive `ls`
 
 ## tailoring less
-#alias more='less'
 #export PAGER=less
 #export LESSCHARSET='latin1'
 #export LESSOPEN='|/usr/bin/lesspipe.sh %s 2>&-'
