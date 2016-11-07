@@ -333,7 +333,7 @@ complete -f -o default -X '!*.pl'	perl perl5
 
 # echo motd
 echo "${BCyan}This is BASH ${BRed}${BASH_VERSION%.*}${NC}\n"
-date
+date && echo
 if command -v fortune >/dev/null; then
 	fortune -s	# Makes the day a bit more fun :)
 fi
