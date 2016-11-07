@@ -183,6 +183,46 @@ function extract {
 	fi
 }
 
+# checks for Git for Windows updates (does not run in Cygwin/Linux)
+function git-for-windows-check {
+	if [ ! -z "$EXEPATH" ]; then
+		github_api_base_url='https://api.github.com'
+		github_rate_limit_status="$(
+			curl -sI "${github_api_base_url}/rate_limit" |
+			grep 'Status: ' |
+			cut -d ' ' -f '2'
+		)"
+		if [ "$github_rate_limit_status" == '200' ]; then
+			current_git_version="$(
+				git --version |
+				sed 's/git version */v/'
+			)"
+			git_href_frag='repos/git-for-windows/git/releases/latest'
+			git_for_windows_api_resp="$(
+				curl -s "${github_api_base_url}/${git_href_frag}"
+			)"
+			latest_git_version="$(
+				echo "$git_for_windows_api_resp" |
+				grep '"tag_name"' |
+				awk -F\" '{print $(NF-1)}'
+			)"
+			if [ "$current_git_version" != "$latest_git_version" ]; then
+				latest_git_release_page="$(
+					echo "$git_for_windows_api_resp" |
+					grep -e '^  "html_url"' |
+					awk -F\" '{print $(NF-1)}'
+				)"
+				echo -e "${BRed}Your version of Git for Windows" \
+				        "(${current_git_version}) is out of date!${NC}"
+				echo -e "The latest version (${latest_git_version})" \
+				        'can be downloaded here:'
+				echo -e "  ${BGreen}${latest_git_release_page}${NC}"
+				echo
+			fi
+		fi
+	fi
+}
+
 # exit function
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
 function _exit {
@@ -334,6 +374,7 @@ complete -f -o default -X '!*.pl'	perl perl5
 # echo motd
 echo "${BCyan}This is BASH ${BRed}${BASH_VERSION%.*}${NC}\n"
 date && echo
+git-for-windows-check
 if command -v fortune >/dev/null; then
 	fortune -s	# Makes the day a bit more fun :)
 fi
