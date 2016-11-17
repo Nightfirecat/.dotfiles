@@ -1,0 +1,24 @@
+# This is Git's global configuration.
+# The persistent system-level config (for Git for Windows) is located at
+# /c/ProgramData/Git/config, or is otherwise accessed via
+# `git config --system --edit` on other Git distributions.
+
+[color]
+	branch = auto
+	diff = auto
+	interactive = true
+	status = auto
+[core]
+	autocrlf = false
+	fscache = true
+	symlinks = false
+	whitespace = cr-at-eol
+# diff document files based on their text contents rather than binaries
+[diff "astextplain"]
+	textconv = astextplain
+[help]
+	format = html
+[push]
+	default = current
+[rebase]
+	autosquash = true
