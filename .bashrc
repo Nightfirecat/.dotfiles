@@ -317,7 +317,7 @@ alias tree='tree -Csuh'	# nice alternative to recursive `ls`
 ###       http://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
 
 # start ssh-agent
-ssh-setup
+ssh-setup 2>/dev/null
 
 if ! ssh-add -l > /dev/null; then
 	echo 'Dead socket, clearing cached file' \
