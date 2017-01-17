@@ -11,6 +11,7 @@
 [core]
 	autocrlf = false
 	fscache = true
+	pager = less -x1,5
 	symlinks = false
 	whitespace = cr-at-eol
 # diff document files based on their text contents rather than binaries
