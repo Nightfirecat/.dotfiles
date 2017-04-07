@@ -212,7 +212,7 @@ function git-for-windows-check {
 					grep -e '^  "html_url"' |
 					awk -F\" '{print $(NF-1)}'
 				)"
-				echo -e "${BRed}Your version of Git for Windows" \
+				echo -e "${ALERT}Your version of Git for Windows" \
 				        "(${current_git_version}) is out of date!${NC}"
 				echo -e "The latest version (${latest_git_version})" \
 				        'can be downloaded here:'
