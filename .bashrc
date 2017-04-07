@@ -150,9 +150,9 @@ function fe {
 function swap {
 	local TMPFILE=tmp.$$
 
-	[ "$#" -ne 2 ] && echo 'swap: 2 arguments needed' && return 1
-	[ ! -e "$1" ] && echo "swap: $1 does not exist" && return 2
-	[ ! -e "$2" ] && echo "swap: $2 does not exist" && return 2
+	[ "$#" -ne 2 ] && echo "${FUNCNAME[0]}: 2 arguments needed" && return 1
+	[ ! -e "$1" ] && echo "${FUNCNAME[0]}: $1 does not exist" && return 2
+	[ ! -e "$2" ] && echo "${FUNCNAME[0]}: $2 does not exist" && return 2
 
 	mv "$1" $TMPFILE
 	mv "$2" "$1"
@@ -176,7 +176,7 @@ function extract {
 			*.Z)         uncompress "$1" ;;
 			*.7z)        7z x "$1"       ;;
 			*)           echo "'$1' cannot be extracted " \
-			                  'via >extract<' ;;
+			                  "via >${FUNCNAME[0]}<" ;;
 		esac
 	else
 		echo "'$1' is not a valid file!"
