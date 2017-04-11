@@ -448,7 +448,7 @@ function .complete {
   done
   parent_path="$(join_by '/' "${path_array[@]}")"
 
-  COMPREPLY=($(compgen -W "$(\ls "$parent_path")" -- "$word"))
+  COMPREPLY=($(compgen -W "$(ls --color=never "$parent_path")" -- "$word"))
 }
 
 complete -F .complete .1 .2 .3 .4 .5 .6 .7 .8 .9
@@ -460,7 +460,8 @@ complete -F .complete .1 .2 .3 .4 .5 .6 .7 .8 .9
 #export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
 
 # echo motd
-echo "${COLOR_BCyan}This is BASH ${COLOR_BRed}${BASH_VERSION%.*}${COLOR_NC}\n"
+echo -e "${COLOR_BCyan}This is BASH" \
+        "${COLOR_BRed}${BASH_VERSION%.*}${COLOR_NC}\n"
 date && echo
 git-for-windows-check
 if command -v fortune >/dev/null; then
