@@ -90,6 +90,7 @@ export COLOR_ALERT="${COLOR_BWhite}${COLOR_On_Red}"
 # start ssh, only prompting for password on new ssh-agent creation
 # (http://unix.stackexchange.com/a/217223/136537)
 function ssh-setup {
+	local brctmp
 	if [ ! -S ~/.ssh/ssh_auth_sock ]; then
 		eval "$(ssh-agent)"
 		ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
@@ -113,6 +114,7 @@ function ssh-setup {
 # test colors available in the terminal
 # (http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html)
 function colortest {
+	local T FGs FG BG
 	T='gYw'   # The test text
 
 	echo -e '\n                 40m     41m     42m     43m' \
@@ -148,11 +150,12 @@ function fe {
 # swap 2 filenames around, if they exist
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
 function swap {
-	local TMPFILE=tmp.$$
-
 	[ "$#" -ne 2 ] && echo "${FUNCNAME[0]}: 2 arguments needed" && return 1
 	[ ! -e "$1" ] && echo "${FUNCNAME[0]}: $1 does not exist" && return 2
 	[ ! -e "$2" ] && echo "${FUNCNAME[0]}: $2 does not exist" && return 2
+
+	local TMPFILE
+	TMPFILE=tmp.$$
 
 	mv "$1" $TMPFILE
 	mv "$2" "$1"
@@ -191,46 +194,55 @@ function .. {
 }
 
 function .1 {
+  local prepend_path
   prepend_path=..
   .cd "${prepend_path}/${1}"
 }
 
 function .2 {
+  local prepend_path
   prepend_path=../..
   .cd "${prepend_path}/${1}"
 }
 
 function .3 {
+  local prepend_path
   prepend_path=../../..
   .cd "${prepend_path}/${1}"
 }
 
 function .4 {
+  local prepend_path
   prepend_path=../../../..
   .cd "${prepend_path}/${1}"
 }
 
 function .5 {
+  local prepend_path
   prepend_path=../../../../..
   .cd "${prepend_path}/${1}"
 }
 
 function .6 {
+  local prepend_path
   prepend_path=../../../../../..
   .cd "${prepend_path}/${1}"
 }
 
 function .7 {
+  local prepend_path
   prepend_path=../../../../../../..
   .cd "${prepend_path}/${1}"
 }
 
 function .8 {
+  local prepend_path
   prepend_path=../../../../../../../..
   .cd "${prepend_path}/${1}"
 }
 
 function .9 {
+  local prepend_path
   prepend_path=../../../../../../../../..
   .cd "${prepend_path}/${1}"
 }
@@ -258,6 +270,10 @@ function join_by {
 # checks for Git for Windows updates (does not run in Cygwin/Linux)
 function git-for-windows-check {
 	if [ ! -z "$EXEPATH" ]; then
+		local github_api_base_url github_rate_limit_status \
+		      current_git_version git_href_frag \
+			  git_for_windows_api_resp latest_git_version \
+			  latest_git_release_page
 		github_api_base_url='https://api.github.com'
 		github_rate_limit_status="$(
 			curl -sI "${github_api_base_url}/rate_limit" |
