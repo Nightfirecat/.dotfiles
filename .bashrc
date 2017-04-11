@@ -49,40 +49,40 @@ bash_start_dir="$HOME"
 
 # colors
 # Normal colors
-Black='\e[0;30m'
-Red='\e[0;31m'
-Green='\e[0;32m'
-Yellow='\e[0;33m'
-Blue='\e[0;34m'
-Purple='\e[0;35m'
-Cyan='\e[0;36m'
-White='\e[0;37m'
+export COLOR_Black='\e[0;30m'
+export COLOR_Red='\e[0;31m'
+export COLOR_Green='\e[0;32m'
+export COLOR_Yellow='\e[0;33m'
+export COLOR_Blue='\e[0;34m'
+export COLOR_Purple='\e[0;35m'
+export COLOR_Cyan='\e[0;36m'
+export COLOR_White='\e[0;37m'
 
 # Bold
-BBlack='\e[1;30m'
-BRed='\e[1;31m'
-BGreen='\e[1;32m'
-BYellow='\e[1;33m'
-BBlue='\e[1;34m'
-BPurple='\e[1;35m'
-BCyan='\e[1;36m'
-BWhite='\e[1;37m'
+export COLOR_BBlack='\e[1;30m'
+export COLOR_BRed='\e[1;31m'
+export COLOR_BGreen='\e[1;32m'
+export COLOR_BYellow='\e[1;33m'
+export COLOR_BBlue='\e[1;34m'
+export COLOR_BPurple='\e[1;35m'
+export COLOR_BCyan='\e[1;36m'
+export COLOR_BWhite='\e[1;37m'
 
 # Background
-On_Black='\e[40m'
-On_Red='\e[41m'
-On_Green='\e[42m'
-On_Yellow='\e[43m'
-On_Blue='\e[44m'
-On_Purple='\e[45m'
-On_Cyan='\e[46m'
-On_White='\e[47m'
+export COLOR_On_Black='\e[40m'
+export COLOR_On_Red='\e[41m'
+export COLOR_On_Green='\e[42m'
+export COLOR_On_Yellow='\e[43m'
+export COLOR_On_Blue='\e[44m'
+export COLOR_On_Purple='\e[45m'
+export COLOR_On_Cyan='\e[46m'
+export COLOR_On_White='\e[47m'
 
 # Color Reset
-NC="\e[m"
+export COLOR_NC="\e[m"
 
 # Alert color (bold white on red background)
-ALERT="${BWhite}${On_Red}"
+export COLOR_ALERT="${COLOR_BWhite}${COLOR_On_Red}"
 
 
 ### functions
@@ -288,7 +288,7 @@ function git-for-windows-check {
 				        "(${current_git_version}) is out of date!${NC}"
 				echo -e "The latest version (${latest_git_version})" \
 				        'can be downloaded here:'
-				echo -e "  ${BGreen}${latest_git_release_page}${NC}"
+				echo -e "  ${COLOR_BGreen}${latest_git_release_page}${COLOR_NC}"
 				echo
 			fi
 		fi
@@ -300,7 +300,7 @@ function git-for-windows-check {
 function _exit {
 	# for some reason, this doesn't respect our alias...
 	# must explicitly add `-e` flag for colors to be shown
-	echo -e "${BCyan}Bye!${NC}"
+	echo -e "${COLOR_BCyan}Bye!${COLOR_NC}"
 	sleep 0.5
 }
 trap _exit EXIT
@@ -460,7 +460,7 @@ complete -F .complete .1 .2 .3 .4 .5 .6 .7 .8 .9
 #export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
 
 # echo motd
-echo "${BCyan}This is BASH ${BRed}${BASH_VERSION%.*}${NC}\n"
+echo "${COLOR_BCyan}This is BASH ${COLOR_BRed}${BASH_VERSION%.*}${COLOR_NC}\n"
 date && echo
 git-for-windows-check
 if command -v fortune >/dev/null; then
