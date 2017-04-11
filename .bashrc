@@ -183,6 +183,78 @@ function extract {
 	fi
 }
 
+# functions for fast traversal through parent directories
+# each acknowledges at most one parameter, containing the path to be traversed
+# after going up N levels, where N is chosen in the function name
+function .. {
+  .1 "$1"
+}
+
+function .1 {
+  prepend_path=..
+  .cd "${prepend_path}/${1}"
+}
+
+function .2 {
+  prepend_path=../..
+  .cd "${prepend_path}/${1}"
+}
+
+function .3 {
+  prepend_path=../../..
+  .cd "${prepend_path}/${1}"
+}
+
+function .4 {
+  prepend_path=../../../..
+  .cd "${prepend_path}/${1}"
+}
+
+function .5 {
+  prepend_path=../../../../..
+  .cd "${prepend_path}/${1}"
+}
+
+function .6 {
+  prepend_path=../../../../../..
+  .cd "${prepend_path}/${1}"
+}
+
+function .7 {
+  prepend_path=../../../../../../..
+  .cd "${prepend_path}/${1}"
+}
+
+function .8 {
+  prepend_path=../../../../../../../..
+  .cd "${prepend_path}/${1}"
+}
+
+function .9 {
+  prepend_path=../../../../../../../../..
+  .cd "${prepend_path}/${1}"
+}
+
+# attempts to navigate to the passed path and print its canonical path
+# (similar to `cd -`)
+function .cd {
+  if cd "$1"; then
+    readlink -f .
+  fi
+}
+
+# prints given elements in $2... joined by the character/string in $1
+# useful for joining elements of an array, ala `join_by "$str" "${arr[@]}"`
+function join_by {
+  if [ $# -lt 2 ]; then return 1; fi
+  local d
+  d="$1"
+  shift
+  echo -n "$1"
+  shift
+  printf '%s' "${@/#/$d}"
+}
+
 # checks for Git for Windows updates (does not run in Cygwin/Linux)
 function git-for-windows-check {
 	if [ ! -z "$EXEPATH" ]; then
@@ -270,12 +342,6 @@ alias vi='vim'
 alias headers='curl -I'
      # test for gzip/mod_deflate support
 alias headersc='curl -I --compress'
-alias ..='cd ..'
-alias .1='..'
-alias .2='.1 && .1'
-alias .3='.2 && .1'
-alias .4='.3 && .1'
-alias .5='.4 && .1'
 
 # add colors for filetype and human-readable sizes by default on `ls`
 alias ls='ls -h --color --show-control-chars'
@@ -334,8 +400,6 @@ if [ "$(echo "${BASH_VERSION}" | cut -d '.' -f '1')"  -lt "3" ]; then
 	return
 fi
 
-shopt -s extglob
-
 complete -A hostname	rsh rcp telnet rlogin ftp ping disk
 complete -A export	printenv
 complete -A variable	export local readonly unset
@@ -364,6 +428,30 @@ complete -f -o default -X '!*.+(bz2|BZ2)'	bunzip2
 complete -f -o default -X '!*.+(zip|ZIP|z|Z|gz|GZ|bz2|BZ2)'	extract
 
 complete -f -o default -X '!*.pl'	perl perl5
+
+# returns completion items for .* functions
+# notably returns files/dirs in parent directories where the command is called
+function .complete {
+  local cmd word
+  cmd="$1"
+  word=${COMP_WORDS[COMP_CWORD]}
+
+  if ! echo "$cmd" | grep -q -E '^\.[1-9]$'; then
+    echo "${FUNCNAME[0]}: parent function must match '.[1-9]'"
+  fi
+
+  local parent_depth path_array parent_path
+  parent_depth="${cmd//.}"
+  path_array=()
+  for (( i=0; i<parent_depth; i++ )); do
+    path_array+=( '..' )
+  done
+  parent_path="$(join_by '/' "${path_array[@]}")"
+
+  COMPREPLY=($(compgen -W "$(\ls "$parent_path")" -- "$word"))
+}
+
+complete -F .complete .1 .2 .3 .4 .5 .6 .7 .8 .9
 
 #export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
 #export HISTIGNORE="&:bg:fg:ll:h"
