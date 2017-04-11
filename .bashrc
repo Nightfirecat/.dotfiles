@@ -101,7 +101,7 @@ function ssh-setup {
 	# only on files which have a header indicating it is an SSH key;
 	# runs grep quietly for neatness
 	brctmp=~/bashrc-temp
-	rm -f "$brctmp"  && \
+	rm -f "$brctmp" && \
 	ssh-add -l > "$brctmp" ; \
 	find ~/.ssh \
 		-type 'f' \
@@ -122,14 +122,13 @@ function colortest {
 
 	for FGs in '    m' '   1m' '  30m' '1;30m' '  31m' '1;31m' \
 	           '  32m' '1;32m' '  33m' '1;33m' '  34m' '1;34m' \
-		   '  35m' '1;35m' '  36m' '1;36m' '  37m' '1;37m';
+	           '  35m' '1;35m' '  36m' '1;36m' '  37m' '1;37m';
 		do FG=${FGs// /}
 		echo -en " $FGs \033[$FG  $T  "
 		for BG in 40m 41m 42m 43m 44m 45m 46m 47m;
-			do echo -en \
-			  "$EINS \033[$FG\033[$BG  $T  \033[0m";
+			do echo -en "$EINS \033[$FG\033[$BG  $T  \033[0m";
 		done
-		echo;
+		echo
 	done
 	echo
 }
@@ -187,84 +186,85 @@ function extract {
 }
 
 # functions for fast traversal through parent directories
-# each acknowledges at most one parameter, containing the path to be traversed
-# after going up N levels, where N is chosen in the function name
+# each processes at most one parameter containing the path to traverse
+# after going up N levels, where N is the number in the function name
 function .. {
-  .1 "$1"
+	.1 "$1"
 }
 
 function .1 {
-  local prepend_path
-  prepend_path=..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=..
+	.cd "${prepend_path}/${1}"
 }
 
 function .2 {
-  local prepend_path
-  prepend_path=../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../..
+	.cd "${prepend_path}/${1}"
 }
 
 function .3 {
-  local prepend_path
-  prepend_path=../../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../../..
+	.cd "${prepend_path}/${1}"
 }
 
 function .4 {
-  local prepend_path
-  prepend_path=../../../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../../../..
+	.cd "${prepend_path}/${1}"
 }
 
 function .5 {
-  local prepend_path
-  prepend_path=../../../../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../../../../..
+	.cd "${prepend_path}/${1}"
 }
 
 function .6 {
-  local prepend_path
-  prepend_path=../../../../../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../../../../../..
+	.cd "${prepend_path}/${1}"
 }
 
 function .7 {
-  local prepend_path
-  prepend_path=../../../../../../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../../../../../../..
+	.cd "${prepend_path}/${1}"
 }
 
 function .8 {
-  local prepend_path
-  prepend_path=../../../../../../../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../../../../../../../..
+	.cd "${prepend_path}/${1}"
 }
 
 function .9 {
-  local prepend_path
-  prepend_path=../../../../../../../../..
-  .cd "${prepend_path}/${1}"
+	local prepend_path
+	prepend_path=../../../../../../../../..
+	.cd "${prepend_path}/${1}"
 }
 
 # attempts to navigate to the passed path and print its canonical path
 # (similar to `cd -`)
 function .cd {
-  if cd "$1"; then
-    readlink -f .
-  fi
+	if cd "$1"; then
+		readlink -f .
+	fi
 }
 
-# prints given elements in $2... joined by the character/string in $1
-# useful for joining elements of an array, ala `join_by "$str" "${arr[@]}"`
+# prints given elements in $2 ... joined by the string in $1
 function join_by {
-  if [ $# -lt 2 ]; then return 1; fi
-  local d
-  d="$1"
-  shift
-  echo -n "$1"
-  shift
-  printf '%s' "${@/#/$d}"
+	if [ $# -lt 2 ]; then return 1; fi
+
+	local d
+
+	d="$1"
+	shift
+	echo -n "$1"
+	shift
+	printf '%s' "${@/#/$d}"
 }
 
 # checks for Git for Windows updates (does not run in Cygwin/Linux)
@@ -446,25 +446,28 @@ complete -f -o default -X '!*.+(zip|ZIP|z|Z|gz|GZ|bz2|BZ2)'	extract
 complete -f -o default -X '!*.pl'	perl perl5
 
 # returns completion items for .* functions
-# notably returns files/dirs in parent directories where the command is called
+# notably returns files/dirs in parent directories from PWD
 function .complete {
-  local cmd word
-  cmd="$1"
-  word=${COMP_WORDS[COMP_CWORD]}
+	local cmd word
+	cmd="$1"
+	word=${COMP_WORDS[COMP_CWORD]}
 
-  if ! echo "$cmd" | grep -q -E '^\.[1-9]$'; then
-    echo "${FUNCNAME[0]}: parent function must match '.[1-9]'"
-  fi
+	if ! echo "$cmd" | grep -q -E '^\.[1-9]$'; then
+		echo "${FUNCNAME[0]}: parent function must match '.[1-9]'"
+		return 1
+	fi
 
-  local parent_depth path_array parent_path
-  parent_depth="${cmd//.}"
-  path_array=()
-  for (( i=0; i<parent_depth; i++ )); do
-    path_array+=( '..' )
-  done
-  parent_path="$(join_by '/' "${path_array[@]}")"
+	local parent_depth path_array parent_path
+	parent_depth="${cmd//.}"
+	path_array=()
+	for (( i=0; i<parent_depth; i++ )); do
+		path_array+=( '..' )
+	done
+	parent_path="$(join_by '/' "${path_array[@]}")"
 
-  COMPREPLY=($(compgen -W "$(ls --color=never "$parent_path")" -- "$word"))
+	COMPREPLY=(
+		$(compgen -W "$(ls --color=never "$parent_path")" -- "$word")
+	)
 }
 
 complete -F .complete .1 .2 .3 .4 .5 .6 .7 .8 .9
