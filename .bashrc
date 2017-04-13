@@ -452,13 +452,16 @@ function .complete {
 	cmd="$1"
 	word=${COMP_WORDS[COMP_CWORD]}
 
-	if ! echo "$cmd" | grep -q -E '^\.[1-9]$'; then
-		echo "${FUNCNAME[0]}: parent function must match '.[1-9]'"
+	if ! echo "$cmd" | grep -q -E '^\.[.1-9]$'; then
+		echo "${FUNCNAME[0]}: parent function must match '.[.1-9]'"
 		return 1
 	fi
 
 	local parent_depth path_array parent_path
 	parent_depth="${cmd//.}"
+	if [[ -z "$parent_depth" ]]; then
+		parent_depth=1
+	fi
 	path_array=()
 	for (( i=0; i<parent_depth; i++ )); do
 		path_array+=( '..' )
@@ -475,7 +478,7 @@ function .complete {
 	)
 }
 
-complete -F .complete .1 .2 .3 .4 .5 .6 .7 .8 .9
+complete -F .complete .. .1 .2 .3 .4 .5 .6 .7 .8 .9
 
 #export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
 #export HISTIGNORE="&:bg:fg:ll:h"
