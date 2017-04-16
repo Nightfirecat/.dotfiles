@@ -466,7 +466,12 @@ function .complete {
 	parent_path="$(join_by '/' "${path_array[@]}")"
 
 	COMPREPLY=(
-		$(compgen -W "$(ls --color=never "$parent_path")" -- "$word")
+		$(
+			compgen -W "$(
+				printf "%s\n" "$parent_path"/*/ |
+				sed -e 's|^\(../\)*||'
+			)" -- "$word"
+		)
 	)
 }
 
