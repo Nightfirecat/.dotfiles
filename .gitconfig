@@ -13,7 +13,7 @@
 	fscache = true
 	pager = less -x1,5
 	symlinks = false
-	whitespace = cr-at-eol
+	whitespace = cr-at-eol,tabwidth=4,trailing-space
 # diff document files based on their text contents rather than binaries
 [diff "astextplain"]
 	textconv = astextplain
