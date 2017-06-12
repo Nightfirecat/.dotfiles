@@ -27,3 +27,6 @@
 	default = current
 [rebase]
 	autosquash = true
+[user]
+	name = Jordan Atwood
+	email = jordan.atwood423@gmail.com

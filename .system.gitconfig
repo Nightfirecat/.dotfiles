@@ -1,0 +1,15 @@
+[commit]
+	gpgsign = true
+[core]
+	# This should be the command invocation to launch the desired editor
+	editor = 'C:/Program Files (x86)/Notepad++/notepad++.exe' -multiInst -nosession -noPlugin
+	# This can be set to true for windows systems; can be left false otherwise
+	autocrlf = true
+	fscache = true
+	symlinks = false
+[sendemail]
+	smtpserver = /bin/msmtp.exe
+[user]
+	# The signing key should be set to the public key alias shown when running
+	#   gpg --list-keys
+	signingKey = D34DBEEF
