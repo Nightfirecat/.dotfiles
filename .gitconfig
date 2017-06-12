@@ -3,6 +3,8 @@
 # /c/ProgramData/Git/config, or is otherwise accessed via
 # `git config --system --edit` on other Git distributions.
 
+[alias]
+	pullr = pull --rebase
 [color]
 	branch = auto
 	diff = auto
