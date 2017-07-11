@@ -14,7 +14,6 @@ fi
 
 ### set shell options
 set -o notify
-set -o noclobber
 set -o ignoreeof
      # see http://wiki.bash-hackers.org/internals/shell_options#extglob
 shopt -s extglob
