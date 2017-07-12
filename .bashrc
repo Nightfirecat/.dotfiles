@@ -269,17 +269,17 @@ function join_by {
 # checks for Git for Windows updates (does not run in Cygwin/Linux)
 function git-for-windows-check {
 	if [ ! -z "$EXEPATH" ]; then
-		local github_api_base_url github_rate_limit_status \
+		local github_api_base_url github_rate_limit_remaining \
 		      current_git_version git_href_frag \
 			  git_for_windows_api_resp latest_git_version \
 			  latest_git_release_page
 		github_api_base_url='https://api.github.com'
-		github_rate_limit_status="$(
+		github_rate_limit_remaining="$(
 			curl -sI "${github_api_base_url}/rate_limit" |
-			grep 'Status: ' |
+			grep 'X-RateLimit-Remaining: ' |
 			cut -d ' ' -f '2'
 		)"
-		if [ "$github_rate_limit_status" == '200' ]; then
+		if [ "$github_rate_limit_remaining" != '0' ]; then
 			current_git_version="$(
 				git --version |
 				sed 's/git version */v/'
