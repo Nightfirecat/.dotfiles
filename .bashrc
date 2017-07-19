@@ -272,10 +272,17 @@ function git-for-windows-check {
 		local github_api_base_url github_rate_limit_remaining \
 		      current_git_version git_href_frag \
 			  git_for_windows_api_resp latest_git_version \
-			  latest_git_release_page
+			  latest_git_release_page gh_oauth_file gh_oauth_frag
+		gh_oauth_file='.bashrc_config/github-oauth'
+		if [[ -f "$gh_oauth_file" && $(wc "$gh_oauth_file") == 2 ]]; then
+			gh_oauth_frag="&client_id=$(head -n 1 "$gh_oauth_file")&client_"
+			gh_oauth_frag="${gh_oauth_frag}secret=$(tail -n 1 "$gh_oauth_file")"
+		else
+			gh_oauth_frag=''
+		fi
 		github_api_base_url='https://api.github.com'
 		github_rate_limit_remaining="$(
-			curl -sI "${github_api_base_url}/rate_limit" |
+			curl -sI "${github_api_base_url}/rate_limit${gh_oauth_frag}" |
 			grep 'X-RateLimit-Remaining: ' |
 			cut -d ' ' -f '2'
 		)"
@@ -286,7 +293,8 @@ function git-for-windows-check {
 			)"
 			git_href_frag='repos/git-for-windows/git/releases/latest'
 			git_for_windows_api_resp="$(
-				curl -s "${github_api_base_url}/${git_href_frag}"
+				curl -s \
+                 "${github_api_base_url}/${git_href_frag}${gh_oauth_frag}"
 			)"
 			latest_git_version="$(
 				echo "$git_for_windows_api_resp" |
