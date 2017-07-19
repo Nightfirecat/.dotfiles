@@ -338,7 +338,6 @@ alias ln='ln -i'
 alias chown='chown --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chgrp='chgrp --preserve-root'
-alias echo='echo -e'
 alias df='df -Th'
 alias mkdir='mkdir -pv'
 alias less='less -R'
@@ -487,7 +486,7 @@ complete -F .complete .. .1 .2 .3 .4 .5 .6 .7 .8 .9
 
 #export TIMEFORMAT=$'\nreal %3R\tuser %3U\tsys %3S\tpcpu %P\n'
 #export HISTIGNORE="&:bg:fg:ll:h"
-#export HISTTIMEFORMAT="$(echo ${BCyan})[%d/%m %H:%M:%S]$(echo ${NC}) "
+#export HISTTIMEFORMAT="$(echo -e ${BCyan})[%d/%m %H:%M:%S]$(echo -e ${NC}) "
 #export HISTCONTROL=ignoredups
 #export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
 
