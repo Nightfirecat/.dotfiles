@@ -269,10 +269,9 @@ function join_by {
 # checks for Git for Windows updates (does not run in Cygwin/Linux)
 function git-for-windows-check {
 	if uname -s | grep -q 'MINGW'; then
-		local github_api_base_url github_rate_limit_remaining \
-		      current_git_version git_href_frag \
-			  git_for_windows_api_resp latest_git_version \
-			  latest_git_release_page gh_oauth_file gh_oauth_frag
+		local gh_api_base_url gh_rate_limit_remaining current_git_version \
+		  git_href_frag git_for_windows_api_resp latest_git_version \
+		  latest_git_release_page gh_oauth_file gh_oauth_frag
 		gh_oauth_file='.bashrc_config/github-oauth'
 		if [[ -f "$gh_oauth_file" && $(wc "$gh_oauth_file") == 2 ]]; then
 			gh_oauth_frag="&client_id=$(head -n 1 "$gh_oauth_file")&client_"
@@ -280,21 +279,20 @@ function git-for-windows-check {
 		else
 			gh_oauth_frag=''
 		fi
-		github_api_base_url='https://api.github.com'
-		github_rate_limit_remaining="$(
-			curl -sI "${github_api_base_url}/rate_limit${gh_oauth_frag}" |
+		gh_api_base_url='https://api.github.com'
+		gh_rate_limit_remaining="$(
+			curl -sI "${gh_api_base_url}/rate_limit${gh_oauth_frag}" |
 			grep 'X-RateLimit-Remaining: ' |
 			cut -d ' ' -f '2'
 		)"
-		if [ "$github_rate_limit_remaining" != '0' ]; then
+		if [ "$gh_rate_limit_remaining" != '0' ]; then
 			current_git_version="$(
 				git --version |
 				sed 's/git version */v/'
 			)"
 			git_href_frag='repos/git-for-windows/git/releases/latest'
 			git_for_windows_api_resp="$(
-				curl -s \
-                 "${github_api_base_url}/${git_href_frag}${gh_oauth_frag}"
+				curl -s "${gh_api_base_url}/${git_href_frag}${gh_oauth_frag}"
 			)"
 			latest_git_version="$(
 				echo "$git_for_windows_api_resp" |
