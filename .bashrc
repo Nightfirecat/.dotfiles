@@ -268,7 +268,7 @@ function join_by {
 
 # checks for Git for Windows updates (does not run in Cygwin/Linux)
 function git-for-windows-check {
-	if [ ! -z "$EXEPATH" ]; then
+	if uname -s | grep -q 'MINGW'; then
 		local github_api_base_url github_rate_limit_remaining \
 		      current_git_version git_href_frag \
 			  git_for_windows_api_resp latest_git_version \
