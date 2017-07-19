@@ -296,14 +296,12 @@ function git-for-windows-check {
 			)"
 			latest_git_version="$(
 				echo "$git_for_windows_api_resp" |
-				grep '"tag_name"' |
-				awk -F\" '{print $(NF-1)}'
+				jq -r '.tag_name'
 			)"
 			if [ "$current_git_version" != "$latest_git_version" ]; then
 				latest_git_release_page="$(
 					echo "$git_for_windows_api_resp" |
-					grep -e '^  "html_url"' |
-					awk -F\" '{print $(NF-1)}'
+					jq -r '.html_url'
 				)"
 				echo -e "${ALERT}Your version of Git for Windows" \
 				        "(${current_git_version}) is out of date!${NC}"
