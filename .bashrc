@@ -377,6 +377,12 @@ alias lr='ll -R'	# recursive ls
 alias la='ll -A'	# show hidden files
 alias tree='tree -Csuh'	# nice alternative to recursive `ls`
 
+# Ensure `xdg-open` exists for opening web browser pages
+if ! type xdg-open &>/dev/null; then
+	alias xdg-open='python -m webbrowser'
+fi
+
+
 ## tailoring less
 #export PAGER=less
 #export LESSCHARSET='latin1'
@@ -394,10 +400,18 @@ alias tree='tree -Csuh'	# nice alternative to recursive `ls`
 #export LESS_TERMCAP_ue=$'\E[0m'
 #export LESS_TERMCAP_us=$'\E[01;32m'
 
+
 # OS-specific aliases
-### TODO: program shortcuts, etc?
-###       See "A note about os specific aliases" in:
-###       http://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
+# TODO: check OS and load what is necessary; for now, just load all aliases.*
+#       See "A note about os specific aliases" in:
+#       http://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
+for alias_file in "$bash_util_dir"/aliases.* ; do
+	if ! grep -q -E '\.sample$' <<< "$alias_file"; then
+		# shellcheck disable=SC1090,SC1091
+		. "$alias_file"
+	fi
+done
+
 
 # start ssh-agent
 ssh-setup 2>/dev/null

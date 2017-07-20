@@ -1,0 +1,6 @@
+#!/bin/bash
+alias np='/c/Program\ Files\ \(x86\)/Notepad++/notepad++.exe'
+alias python='/c/python2*/python.exe'
+alias pip='/c/python2*/Scripts/pip.exe'
+alias python3='/c/python3*/python.exe'
+alias pip3='/c/python3*/Scripts/pip.exe'
