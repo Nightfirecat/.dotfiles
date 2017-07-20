@@ -90,7 +90,7 @@ export COLOR_ALERT="${COLOR_BWhite}${COLOR_On_Red}"
 # start ssh, only prompting for password on new ssh-agent creation
 # (http://unix.stackexchange.com/a/217223/136537)
 function ssh-setup {
-	local brctmp
+	local loaded_idents
 	if [ ! -S ~/.ssh/ssh_auth_sock ]; then
 		eval "$(ssh-agent)"
 		ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
@@ -100,15 +100,15 @@ function ssh-setup {
 	# only performs `ssh-add` if key is not loaded in agent and
 	# only on files which have a header indicating it is an SSH key;
 	# runs grep quietly for neatness
-	brctmp=~/bashrc-temp
-	rm -f "$brctmp" && \
-	ssh-add -l > "$brctmp" ; \
-	find ~/.ssh \
-		-type 'f' \
-		-exec grep -q -- '-BEGIN RSA PRIVATE KEY-' {} \; \
-		! -exec grep -q "{}" "$brctmp" \; \
-		-exec ssh-add {} \; && \
-	rm -f "$brctmp"
+	loaded_idents="$(ssh-add -l)"
+	for file in ~/.ssh/* ; do
+		if [[ -f "$file" ]] && \
+		grep -q -- '-BEGIN RSA PRIVATE KEY-' "$file" && \
+		! grep -q "$file" <<< "$loaded_idents";
+		then
+			ssh-add "$file"
+		fi
+	done
 }
 
 # test colors available in the terminal
