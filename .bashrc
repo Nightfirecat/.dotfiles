@@ -296,13 +296,11 @@ function git-for-windows-check {
 				curl -s "${gh_api_base_url}/${git_href_frag}${gh_oauth_frag}"
 			)"
 			latest_git_version="$(
-				echo "$git_for_windows_api_resp" |
-				jq -r '.tag_name'
+				jq -r '.tag_name' <<< "$git_for_windows_api_resp"
 			)"
 			if [ "$current_git_version" != "$latest_git_version" ]; then
 				latest_git_release_page="$(
-					echo "$git_for_windows_api_resp" |
-					jq -r '.html_url'
+					jq -r '.html_url' <<< "$git_for_windows_api_resp"
 				)"
 				echo -e "${ALERT}Your version of Git for Windows" \
 				        "(${current_git_version}) is out of date!${NC}"
@@ -413,7 +411,7 @@ fi
 
 # programmable completion
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
-if [ "$(echo "${BASH_VERSION}" | cut -d '.' -f '1')"  -lt "3" ]; then
+if [ "$(cut -d '.' -f '1' <<< "$BASH_VERSION")"  -lt "3" ]; then
 	echo 'You will need to upgrade to version 3.0 for full' \
 	     'programmable completion features'
 	return
@@ -455,7 +453,7 @@ function .complete {
 	cmd="$1"
 	word=${COMP_WORDS[COMP_CWORD]}
 
-	if ! echo "$cmd" | grep -q -E '^\.[.1-9]$'; then
+	if ! grep -q -E '^\.[.1-9]$' <<< "$cmd"; then
 		echo "${FUNCNAME[0]}: parent function must match '.[.1-9]'"
 		return 1
 	fi
