@@ -274,7 +274,7 @@ function git-for-windows-check {
 		  git_href_frag git_for_windows_api_resp latest_git_version \
 		  latest_git_release_page gh_oauth_file gh_oauth_frag
 		gh_oauth_file="${bash_util_dir}/github-oauth"
-		if [[ -f "$gh_oauth_file" && $(wc "$gh_oauth_file") == 2 ]]; then
+		if [[ -f "$gh_oauth_file" && $(wc -l < "$gh_oauth_file") == 2 ]]; then
 			gh_oauth_frag="?client_id=$(head -n 1 "$gh_oauth_file")&client_"
 			gh_oauth_frag="${gh_oauth_frag}secret=$(tail -n 1 "$gh_oauth_file")"
 		else
