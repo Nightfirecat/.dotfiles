@@ -1,6 +1,21 @@
 #!/bin/bash
-alias np='/c/Program\ Files\ \(x86\)/Notepad++/notepad++.exe'
+
+# simple aliases
 alias python='/c/python2*/python.exe'
 alias pip='/c/python2*/Scripts/pip.exe'
 alias python3='/c/python3*/python.exe'
 alias pip3='/c/python3*/Scripts/pip.exe'
+
+# complex aliases
+function np {
+	local np
+	np='/c/Program Files (x86)/Notepad++/notepad++.exe'
+	# Git for Windows bash does not have pgrep :c
+	#shellcheck disable=SC2009
+	if ps aux | grep -q 'notepad++'; then
+		"$np" "$@"
+	else
+		# preferred over `"$np" &@ &` `disown -h` as it hides the job# output
+		("$np" "$@" &) &>/dev/null
+	fi
+}
