@@ -47,6 +47,17 @@ shopt -u nullglob	# `ls nonexist/*` should fail, not act like `ls`
 bash_start_dir="$HOME"
 bash_util_dir=~/.bashrc_util
 
+# function globals
+gh_oauth_file="${bash_util_dir}/github-oauth"
+if [[ -f "$gh_oauth_file" && $(wc -l < "$gh_oauth_file") == 2 ]]; then
+	gh_oauth_frag="?client_id=$(head -n 1 "$gh_oauth_file")&client_"
+	gh_oauth_frag="${gh_oauth_frag}secret=$(tail -n 1 "$gh_oauth_file")"
+else
+	gh_oauth_frag=''
+fi
+gh_api_base_url='https://api.github.com'
+
+
 # colors
 # Normal colors
 export COLOR_Black='\e[0;30m'
@@ -267,48 +278,110 @@ function join_by {
 	printf '%s' "${@/#/$d}"
 }
 
-# checks for Git for Windows updates (does not run in Cygwin/Linux)
-function git-for-windows-check {
+# Compact wrapper function for GitHub API calls
+# Prints API response for a given path, using available OAuth credentials
+# if available.
+# Returns 1 for argument mismatch (not exactly 1 argument)
+# Returns 2 if GitHub rate limit has been reached
+function query_github_api {
+	[ "$#" -ne 1 ] && echo "${FUNCNAME[0]}: 1 argument needed" >&2 && return 1
+
+	local gh_rate_limit_resp gh_rate_limit_remaining gh_rate_limit_reset
+	gh_rate_limit_resp="$(
+		curl -sI "${gh_api_base_url}/rate_limit${gh_oauth_frag}"
+	)"
+	gh_rate_limit_remaining="$(
+		grep 'X-RateLimit-Remaining: ' <<< "${gh_rate_limit_resp}" |
+		cut -d ' ' -f '2'
+	)"
+	if [ "$gh_rate_limit_remaining" -eq '0' ]; then
+		gh_rate_limit_reset="$(
+			grep 'X-RateLimit-Reset: ' <<< "${gh_rate_limit_resp}" |
+			cut -d ' ' -f '2'
+		)"
+		{
+			echo "${FUNCNAME[0]}: GitHub API rate limit reached!"
+			echo "This limit is reset at ${gh_rate_limit_reset}"
+		} >&2
+		return 2
+	else
+		curl -s "${gh_api_base_url}/${1}${gh_oauth_frag}"
+	fi
+}
+
+# checks for jq updates, downloads if needed
+# does not rely on query_github_api(), as that function depends on jq
+function jq-check {
+	# For now, only process on Windows; OSX and linux will use package managers
+	# see https://stedolan.github.io/jq/download/ for info
+	# run update command (no-op on latest package version is fine)
 	if uname -s | grep -q 'MINGW'; then
-		local gh_api_base_url gh_rate_limit_remaining current_git_version \
-		  git_href_frag git_for_windows_api_resp latest_git_version \
-		  latest_git_release_page gh_oauth_file gh_oauth_frag
-		gh_oauth_file="${bash_util_dir}/github-oauth"
-		if [[ -f "$gh_oauth_file" && $(wc -l < "$gh_oauth_file") == 2 ]]; then
-			gh_oauth_frag="?client_id=$(head -n 1 "$gh_oauth_file")&client_"
-			gh_oauth_frag="${gh_oauth_frag}secret=$(tail -n 1 "$gh_oauth_file")"
-		else
-			gh_oauth_frag=''
-		fi
-		gh_api_base_url='https://api.github.com'
+		local gh_rate_limit_remaining jq_url_frag gh_response jq_gh_version \
+		  arch download_url
 		gh_rate_limit_remaining="$(
 			curl -sI "${gh_api_base_url}/rate_limit${gh_oauth_frag}" |
 			grep 'X-RateLimit-Remaining: ' |
 			cut -d ' ' -f '2'
 		)"
 		if [ "$gh_rate_limit_remaining" != '0' ]; then
-			current_git_version="$(
-				git --version |
-				sed 's/git version */v/'
+			jq_url_frag='repos/stedolan/jq/releases/latest'
+			gh_response="$(
+				curl -s "${gh_api_base_url}/${jq_url_frag}${gh_oauth_frag}"
 			)"
-			git_href_frag='repos/git-for-windows/git/releases/latest'
-			git_for_windows_api_resp="$(
-				curl -s "${gh_api_base_url}/${git_href_frag}${gh_oauth_frag}"
+			jq_gh_version="$(
+				grep '"tag_name"' <<< "$gh_response" |
+				awk -F\" '{print $(NF-1)}'
 			)"
-			latest_git_version="$(
-				jq -r '.tag_name' <<< "$git_for_windows_api_resp"
-			)"
-			if [ "$current_git_version" != "$latest_git_version" ]; then
-				latest_git_release_page="$(
-					jq -r '.html_url' <<< "$git_for_windows_api_resp"
+			if ! type jq &>/dev/null ||
+			   [ "$(jq --version)" != "$jq_gh_version" ];
+			then
+				echo 'Downloading jq...'
+				if grep '64' <<< "$(uname -m)" ; then
+					arch='64'
+				else
+					arch='32'
+				fi
+				download_url="$(
+					grep '"browser_download_url"' <<< "$gh_response" |
+					grep "win${arch}" |
+					awk -F\" '{print $(NF-1)}'
 				)"
-				echo -e "${ALERT}Your version of Git for Windows" \
-				        "(${current_git_version}) is out of date!${NC}"
-				echo -e "The latest version (${latest_git_version})" \
-				        'can be downloaded here:'
-				echo -e "  ${COLOR_BGreen}${latest_git_release_page}${COLOR_NC}"
+				curl -L -o ~/bin/jq.exe "$download_url"
+				echo 'jq installed!'
 				echo
 			fi
+		fi
+	fi
+}
+
+# checks for Git for Windows updates (does not run in Cygwin/Linux)
+function git-for-windows-check {
+	if uname -s | grep -q 'MINGW'; then
+		local git_href_frag git_for_windows_api_resp current_git_version \
+		  latest_git_version latest_git_release_page
+		git_href_frag='repos/git-for-windows/git/releases/latest'
+		git_for_windows_api_resp="$(query_github_api "$git_href_frag")" ||
+			echo \
+			  'GitHub API rate limit reached, skipping git-for-windows check' \
+			  >&2 &&
+			return 1
+		current_git_version="$(
+			git --version |
+			sed 's/git version */v/'
+		)"
+		latest_git_version="$(
+			jq -r '.tag_name' <<< "$git_for_windows_api_resp"
+		)"
+		if [ "$current_git_version" != "$latest_git_version" ]; then
+		  latest_git_release_page="$(
+			jq -r '.html_url' <<< "$git_for_windows_api_resp"
+		  )"
+		  echo -e "${ALERT}Your version of Git for Windows" \
+				  "(${current_git_version}) is out of date!${NC}"
+		  echo -e "The latest version (${latest_git_version})" \
+				  'can be downloaded here:'
+		  echo -e "  ${COLOR_BGreen}${latest_git_release_page}${COLOR_NC}"
+		  echo
 		fi
 	fi
 }
@@ -505,6 +578,7 @@ complete -F .complete .. .1 .2 .3 .4 .5 .6 .7 .8 .9
 echo -e "${COLOR_BCyan}This is BASH" \
         "${COLOR_BRed}${BASH_VERSION%.*}${COLOR_NC}\n"
 date && echo
+jq-check
 git-for-windows-check
 if command -v fortune >/dev/null; then
 	fortune -s	# Makes the day a bit more fun :)
