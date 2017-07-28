@@ -485,6 +485,11 @@ for alias_file in "$bash_util_dir"/aliases.* ; do
 	fi
 done
 
+# thefuck alias
+if type thefuck &>/dev/null; then
+	eval $(thefuck --alias)
+fi
+
 
 # start ssh-agent
 ssh-setup 2>/dev/null
