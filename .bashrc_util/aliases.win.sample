@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # simple aliases
-alias python='/c/python2*/python.exe'
-export PATH="${PATH}:$(find /c/ -maxdepth '1' -name '[Pp]ython2*')/Scripts"
-alias pip='/c/python2*/Scripts/pip.exe'
-alias python3='/c/python3*/python.exe'
-export PATH="${PATH}:$(find /c/ -maxdepth '1' -name '[Pp]ython3*')/Scripts"
-alias pip3='/c/python3*/Scripts/pip.exe'
+alias python='/c/Python2*/python.exe'
+export PATH="${PATH}:$(find /c/ -maxdepth '1' -name 'Python2*')/Scripts"
+alias pip='/c/Python2*/Scripts/pip.exe'
+alias python3='/c/Python3*/python.exe'
+export PATH="${PATH}:$(find /c/ -maxdepth '1' -name 'Python3*')/Scripts"
+alias pip3='/c/Python3*/Scripts/pip.exe'
 
 # complex aliases
 function np {

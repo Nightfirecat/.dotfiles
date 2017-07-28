@@ -96,6 +96,100 @@ export COLOR_NC="\e[m"
 export COLOR_ALERT="${COLOR_BWhite}${COLOR_On_Red}"
 
 
+### scripts
+
+# aliases (can be bypassed by using `\command`)
+# (http://ss64.com/bash/alias.html)
+alias rm='rm -I --preserve-root'
+alias mv='mv -i'
+alias cp='cp -i'
+alias ln='ln -i'
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
+alias df='df -Th'
+alias mkdir='mkdir -pv'
+alias less='less -R'
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias mount='mount | column -t'
+alias shellcheck='shellcheck --color'
+
+alias aliases='alias -p'
+alias h='history'
+alias j='jobs -l'
+alias which='type -a'
+alias more='less'
+alias path='echo ${PATH//:/\\n}'	# pretty-print $PATH dirs
+alias sha1='openssl sha1'
+alias now='date +"%T"'
+alias nowtime='now'
+alias nowdate='date +"%d-%m-%y"'
+alias vi='vim'
+     # get headers
+alias headers='curl -I'
+     # test for gzip/mod_deflate support
+alias headersc='curl -I --compress'
+
+# add colors for filetype and human-readable sizes by default on `ls`
+alias ls='ls -h --color --show-control-chars'
+alias lx='ls -lXB'	# sort by extension
+alias lk='ls -lSr'	# sort by date, biggest last
+alias lt='ls -ltr'	# sort by date, most recent last
+alias lc='ls -ltcr'	# sort by/show change time, most recent last
+alias lu='ls -ltur'	# sort by/show access time, most recent last
+
+# add `ll`: directories first with alphanumeric sorting
+alias ll='ls -lv --group-directories-first'
+# can add the following to group dir *and symlinks to dirs* first:
+# http://unix.stackexchange.com/a/111639/136537
+alias lm='ll | more'	# pipe through `more`
+alias lr='ll -R'	# recursive ls
+alias la='ll -A'	# show hidden files
+alias tree='tree -Csuh'	# nice alternative to recursive `ls`
+
+# Ensure `xdg-open` exists for opening web browser pages
+if ! type xdg-open &>/dev/null; then
+	alias xdg-open='python -m webbrowser'
+fi
+
+
+## tailoring less
+#export PAGER=less
+#export LESSCHARSET='latin1'
+#export LESSOPEN='|/usr/bin/lesspipe.sh %s 2>&-'
+#                # Use this if lesspipe.sh exists.
+#export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \
+#:stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
+#
+#LESS man page colors (makes Man pages more readable).
+#export LESS_TERMCAP_mb=$'\E[01;31m'
+#export LESS_TERMCAP_md=$'\E[01;31m'
+#export LESS_TERMCAP_me=$'\E[0m'
+#export LESS_TERMCAP_se=$'\E[0m'
+#export LESS_TERMCAP_so=$'\E[01;44;33m'
+#export LESS_TERMCAP_ue=$'\E[0m'
+#export LESS_TERMCAP_us=$'\E[01;32m'
+
+
+# OS-specific aliases
+# TODO: check OS and load what is necessary; for now, just load all aliases.*
+#       See "A note about os specific aliases" in:
+#       http://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
+for alias_file in "$bash_util_dir"/aliases.* ; do
+	if ! grep -q -E '\.sample$' <<< "$alias_file"; then
+		# shellcheck disable=SC1090,SC1091
+		. "$alias_file"
+	fi
+done
+
+# thefuck alias
+if type thefuck &>/dev/null; then
+	eval "$(thefuck --alias)"
+fi
+
+
 ### functions
 
 # start ssh, only prompting for password on new ssh-agent creation
@@ -386,6 +480,45 @@ function git-for-windows-check {
 	fi
 }
 
+# Checks to ensure Python2 (python) and Python3 (python3) are installed, and
+# are of the correct versions (python =/= Python3)
+# Returns 1 if python or python3 are absent
+# Returns 2 if python/python3 do not associate to Python2/Python3, respectively
+# As of now, only prints the download URL if missing or mismatched
+# TODO: improve this function--download Windows installer
+# TODO: add UNIX package manager commands for non-Windows systems
+function python-check {
+	local error return_val python_download_url
+	error=''
+	return_val=0
+	python_download_url='https://www.python.org/downloads/'
+	if ! type python &>/dev/null ||
+	   ! type python3 &>/dev/null;
+	then
+		! type python &>/dev/null &&
+		  error+="Python2 is missing!\n"
+		! type python3 &>/dev/null &&
+		  error+="Python3 is missing!\n"
+		return_val=1
+	fi
+	if [ "$return_val" -eq 0 ] && (
+	   ! python --version 2>&1 | grep -q ' 2.' ||
+	   ! python3 --version 2>&1 | grep -q ' 3.'
+	); then
+		! python --version 2>&1 | grep -q ' 2.' &&
+		  error+="${COLOR_Yellow}python${COLOR_NC} is not Python2!\n"
+		! python3 --version 2>&1 | grep -q ' 3.' &&
+		  error+="${COLOR_Yellow}python3${COLOR_NC} is not Python3!\n"
+		return_val=2
+	fi
+
+	[[ ! -z "$error" ]] && {
+		echo -e "$error"
+		echo "Download python or python3 here: $python_download_url"
+	} >&2
+	return "$return_val"
+}
+
 # exit function
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
 function _exit {
@@ -396,110 +529,6 @@ function _exit {
 }
 trap _exit EXIT
 
-
-### scripts
-
-# aliases (can be bypassed by using `\command`)
-# (http://ss64.com/bash/alias.html)
-alias rm='rm -I --preserve-root'
-alias mv='mv -i'
-alias cp='cp -i'
-alias ln='ln -i'
-alias chown='chown --preserve-root'
-alias chmod='chmod --preserve-root'
-alias chgrp='chgrp --preserve-root'
-alias df='df -Th'
-alias mkdir='mkdir -pv'
-alias less='less -R'
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias mount='mount | column -t'
-alias shellcheck='shellcheck --color'
-
-alias aliases='alias -p'
-alias h='history'
-alias j='jobs -l'
-alias which='type -a'
-alias more='less'
-alias path='echo ${PATH//:/\\n}'	# pretty-print $PATH dirs
-alias sha1='openssl sha1'
-alias now='date +"%T"'
-alias nowtime='now'
-alias nowdate='date +"%d-%m-%y"'
-alias vi='vim'
-     # get headers
-alias headers='curl -I'
-     # test for gzip/mod_deflate support
-alias headersc='curl -I --compress'
-
-# add colors for filetype and human-readable sizes by default on `ls`
-alias ls='ls -h --color --show-control-chars'
-alias lx='ls -lXB'	# sort by extension
-alias lk='ls -lSr'	# sort by date, biggest last
-alias lt='ls -ltr'	# sort by date, most recent last
-alias lc='ls -ltcr'	# sort by/show change time, most recent last
-alias lu='ls -ltur'	# sort by/show access time, most recent last
-
-# add `ll`: directories first with alphanumeric sorting
-alias ll='ls -lv --group-directories-first'
-# can add the following to group dir *and symlinks to dirs* first:
-# http://unix.stackexchange.com/a/111639/136537
-alias lm='ll | more'	# pipe through `more`
-alias lr='ll -R'	# recursive ls
-alias la='ll -A'	# show hidden files
-alias tree='tree -Csuh'	# nice alternative to recursive `ls`
-
-# Ensure `xdg-open` exists for opening web browser pages
-if ! type xdg-open &>/dev/null; then
-	alias xdg-open='python -m webbrowser'
-fi
-
-
-## tailoring less
-#export PAGER=less
-#export LESSCHARSET='latin1'
-#export LESSOPEN='|/usr/bin/lesspipe.sh %s 2>&-'
-#                # Use this if lesspipe.sh exists.
-#export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \
-#:stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
-#
-#LESS man page colors (makes Man pages more readable).
-#export LESS_TERMCAP_mb=$'\E[01;31m'
-#export LESS_TERMCAP_md=$'\E[01;31m'
-#export LESS_TERMCAP_me=$'\E[0m'
-#export LESS_TERMCAP_se=$'\E[0m'
-#export LESS_TERMCAP_so=$'\E[01;44;33m'
-#export LESS_TERMCAP_ue=$'\E[0m'
-#export LESS_TERMCAP_us=$'\E[01;32m'
-
-
-# OS-specific aliases
-# TODO: check OS and load what is necessary; for now, just load all aliases.*
-#       See "A note about os specific aliases" in:
-#       http://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
-for alias_file in "$bash_util_dir"/aliases.* ; do
-	if ! grep -q -E '\.sample$' <<< "$alias_file"; then
-		# shellcheck disable=SC1090,SC1091
-		. "$alias_file"
-	fi
-done
-
-# thefuck alias
-if type thefuck &>/dev/null; then
-	eval "$(thefuck --alias)"
-fi
-
-
-# start ssh-agent
-ssh-setup 2>/dev/null
-
-if ! ssh-add -l > /dev/null; then
-	echo 'Dead socket, clearing cached file' \
-	     'and retrying ssh-agent setup'
-	rm ~/.ssh/ssh_auth_sock
-	ssh-setup
-fi
 
 # programmable completion
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
@@ -579,12 +608,23 @@ complete -F .complete .. .1 .2 .3 .4 .5 .6 .7 .8 .9
 #export HISTCONTROL=ignoredups
 #export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
 
+# start ssh-agent
+ssh-setup 2>/dev/null
+
+if ! ssh-add -l > /dev/null; then
+	echo 'Dead socket, clearing cached file' \
+	     'and retrying ssh-agent setup'
+	rm ~/.ssh/ssh_auth_sock
+	ssh-setup
+fi
+
 # echo motd
 echo -e "${COLOR_BCyan}This is BASH" \
         "${COLOR_BRed}${BASH_VERSION%.*}${COLOR_NC}\n"
 date && echo
 jq-check
 git-for-windows-check
+python-check
 if command -v fortune >/dev/null; then
 	fortune -s	# Makes the day a bit more fun :)
 fi
