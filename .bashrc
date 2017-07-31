@@ -519,6 +519,22 @@ function python-check {
 	return "$return_val"
 }
 
+# Runs software checks and pulls .dotfiles repo if branch is master
+function software-and-bashrc-check {
+	local dotfiles_update_output
+	jq-check
+	git-for-windows-check
+	python-check
+	dotfiles_update_output="$(
+		cd "$bash_start_dir" &&
+		[[ "$(git symbolic-ref --short HEAD)" == 'master' ]] &&
+		git pull --ff-only
+	)"
+	if [[ "$dotfiles_update_output" != 'Already up-to-date.' ]]; then
+		echo "$dotfiles_update_output"
+	fi
+}
+
 # exit function
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
 function _exit {
@@ -622,12 +638,15 @@ fi
 echo -e "${COLOR_BCyan}This is BASH" \
         "${COLOR_BRed}${BASH_VERSION%.*}${COLOR_NC}\n"
 date && echo
-jq-check
-git-for-windows-check
-python-check
 if command -v fortune >/dev/null; then
 	fortune -s	# Makes the day a bit more fun :)
 fi
 
 # move to bash start dir
-cd "$bash_start_dir" || exit 0
+cd "$bash_start_dir" ||
+  (
+	  echo "Bash start dir '${bash_start_dir}' could not be found!" &&
+	  exit 1
+  )
+
+software-and-bashrc-check
