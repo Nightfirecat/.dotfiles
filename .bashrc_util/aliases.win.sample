@@ -2,10 +2,12 @@
 
 # simple aliases
 alias python='/c/Python2*/python.exe'
-export PATH="${PATH}:$(find /c/ -maxdepth '1' -name 'Python2*')/Scripts"
+python2_path="$(find /c/ -maxdepth '1' -name 'Python2*')/Scripts"
+export PATH="${PATH}:${python2_path}"
 alias pip='/c/Python2*/Scripts/pip.exe'
 alias python3='/c/Python3*/python.exe'
-export PATH="${PATH}:$(find /c/ -maxdepth '1' -name 'Python3*')/Scripts"
+python3_path="$(find /c/ -maxdepth '1' -name 'Python3*')/Scripts"
+export PATH="${PATH}:${python3_path}"
 alias pip3='/c/Python3*/Scripts/pip.exe'
 
 # complex aliases
