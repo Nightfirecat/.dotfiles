@@ -9,9 +9,9 @@ export PATH="${PATH}:$(find /c/ -maxdepth '1' -name 'Python3*')/Scripts"
 alias pip3='/c/Python3*/Scripts/pip.exe'
 
 # complex aliases
+np='/c/Program Files (x86)/Notepad++/notepad++.exe'
+export EDITOR="$np"
 function np {
-	local np
-	np='/c/Program Files (x86)/Notepad++/notepad++.exe'
 	# Git for Windows bash does not have pgrep :c
 	#shellcheck disable=SC2009
 	if ps aux | grep -q 'notepad++'; then
