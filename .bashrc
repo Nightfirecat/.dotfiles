@@ -69,7 +69,7 @@ export COLOR_Purple='\e[0;35m'
 export COLOR_Cyan='\e[0;36m'
 export COLOR_White='\e[0;37m'
 
-# Bold
+# Bright
 export COLOR_BBlack='\e[1;30m'
 export COLOR_BRed='\e[1;31m'
 export COLOR_BGreen='\e[1;32m'
@@ -80,14 +80,14 @@ export COLOR_BCyan='\e[1;36m'
 export COLOR_BWhite='\e[1;37m'
 
 # Background
-export COLOR_On_Black='\e[40m'
-export COLOR_On_Red='\e[41m'
-export COLOR_On_Green='\e[42m'
-export COLOR_On_Yellow='\e[43m'
-export COLOR_On_Blue='\e[44m'
-export COLOR_On_Purple='\e[45m'
-export COLOR_On_Cyan='\e[46m'
-export COLOR_On_White='\e[47m'
+export COLOR_On_Black='\e[40m'	# Equivalent to COLOR_Black
+export COLOR_On_Red='\e[41m'	# Equivalent to COLOR_Red
+export COLOR_On_Green='\e[42m'	# Equivalent to COLOR_Green
+export COLOR_On_Yellow='\e[43m'	# Equivalent to COLOR_Yellow
+export COLOR_On_Blue='\e[44m'	# Equivalent to COLOR_Blue
+export COLOR_On_Purple='\e[45m'	# Equivalent to COLOR_Purple
+export COLOR_On_Cyan='\e[46m'	# Equivalent to COLOR_Cyan
+export COLOR_On_White='\e[47m'	# Equivalent to COLOR_White
 
 # Color Reset
 export COLOR_NC="\e[m"
@@ -470,8 +470,8 @@ function git-for-windows-check {
 		  latest_git_release_page="$(
 			jq -r '.html_url' <<< "$git_for_windows_api_resp"
 		  )"
-		  echo -e "${ALERT}Your version of Git for Windows" \
-				  "(${current_git_version}) is out of date!${NC}"
+		  echo -e "${COLOR_ALERT}Your version of Git for Windows" \
+				  "(${current_git_version}) is out of date!${COLOR_NC}"
 		  echo -e "The latest version (${latest_git_version})" \
 				  'can be downloaded here:'
 		  echo -e "  ${COLOR_BGreen}${latest_git_release_page}${COLOR_NC}"
@@ -519,6 +519,31 @@ function python-check {
 	return "$return_val"
 }
 
+# Prints the code for a random non-black color using echo -e
+function randomcolor {
+	local colors random_index
+	colors=(
+		# "$COLOR_Black" (cannot read on black bg)
+		"$COLOR_Red"
+		"$COLOR_Green"
+		"$COLOR_Yellow"
+		# "$COLOR_Blue" (very hard to read on black bg)
+		"$COLOR_Purple"
+		"$COLOR_Cyan"
+		# "$COLOR_White" (can't differentiate from standard text)
+		"$COLOR_BRed"
+		"$COLOR_BGreen"
+		"$COLOR_BYellow"
+		"$COLOR_BBlue"
+		"$COLOR_BPurple"
+		"$COLOR_BCyan"
+		"$COLOR_BWhite"
+	)
+	random_index="$(shuf -i 1-"${#colors[@]}" -n 1)"
+	random_index=$(( random_index - 1 ))
+	echo -e "${colors[$random_index]}"
+}
+
 # Runs software checks and pulls .dotfiles repo if branch is master
 function software-and-bashrc-check {
 	local dotfiles_update_output
@@ -540,7 +565,7 @@ function software-and-bashrc-check {
 function _exit {
 	# for some reason, this doesn't respect our alias...
 	# must explicitly add `-e` flag for colors to be shown
-	echo -e "${COLOR_BCyan}Bye!${COLOR_NC}"
+	echo -e "$(randomcolor)Bye!${COLOR_NC}"
 	sleep 0.5
 }
 trap _exit EXIT
@@ -635,8 +660,8 @@ if ! ssh-add -l > /dev/null; then
 fi
 
 # echo motd
-echo -e "${COLOR_BCyan}This is BASH" \
-        "${COLOR_BRed}${BASH_VERSION%.*}${COLOR_NC}\n"
+echo -e "$(randomcolor)This is BASH" \
+        "$(randomcolor)${BASH_VERSION%.*}${COLOR_NC}\n"
 date && echo
 if command -v fortune >/dev/null; then
 	fortune -s	# Makes the day a bit more fun :)
