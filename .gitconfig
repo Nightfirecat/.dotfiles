@@ -4,6 +4,7 @@
 # `git config --system --edit` on other Git distributions.
 
 [alias]
+	alias = config --get-regexp ^alias\\.
 	pullr = pull --rebase
 [color]
 	branch = auto
