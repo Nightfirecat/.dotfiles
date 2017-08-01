@@ -519,6 +519,25 @@ function python-check {
 	return "$return_val"
 }
 
+# Prints a human-readable time from a passed number of seconds
+function displaytime {
+	[ "$#" -ne 1 ] && echo "${FUNCNAME[0]}: 1 argument needed" >&2 && return 1
+
+	local T D H M S
+	T="$1"
+	D=$((T/60/60/24))
+	H=$((T/60/60%24))
+	M=$((T/60%60))
+	S=$((T%60))
+	[ "$D" -gt 0 ] &&
+		echo -n "${D}d "
+	([ "$D" -gt 0 ] || [ "$H" -gt 0 ]) &&
+		printf '%02.0fh ' "$H"
+	([ "$D" -gt 0 ] || [ "$H" -gt 0 ] || [ "$M" -gt 0 ]) &&
+		printf '%02.0fm ' "$M"
+	printf '%02.0fs' "$S"
+}
+
 # Prints the code for a random non-black color using echo -e
 function randomcolor {
 	local colors random_index
@@ -542,6 +561,68 @@ function randomcolor {
 	random_index="$(shuf -i 1-"${#colors[@]}" -n 1)"
 	random_index=$(( random_index - 1 ))
 	echo -e "${colors[$random_index]}"
+}
+
+# Prints the message of the day (time, shell info, system info, etc.)
+function motd {
+	local kernel_string uptime_seconds uptime_msg cpuinfo cpu_model cpu_cores \
+	      cpu_msg free_memory total_memory mem_msg
+
+	# Print shell info
+	echo -e "$(randomcolor)This is BASH" \
+			"$(randomcolor)${BASH_VERSION%.*}${COLOR_NC}"
+	kernel_string="$(
+		(
+			uname -s
+			uname -r
+			uname -m
+			uname -o
+		) | tr "\n" ' '
+	)"
+	echo -e "This kernel is: $(randomcolor)${kernel_string}${COLOR_NC}"
+
+	# Print date and uptime
+	echo -e "It's $(randomcolor)$(date)${COLOR_NC}"
+	uptime_seconds="$(cut -d '.' -f 1 < /proc/uptime)"
+	uptime_msg="This machine has been up for $(randomcolor)"
+	uptime_msg+="$(displaytime "$uptime_seconds")${COLOR_NC}"
+	echo -e "$uptime_msg"
+	echo
+
+	# Print CPU and Memory info
+	cpuinfo="$(cat /proc/cpuinfo)"
+	cpu_model="$(
+		grep -m 1 'model name' <<< "$cpuinfo" |
+		cut -d ':' -f 2 |
+		sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+	)"
+	cpu_cores="$(
+		grep -m 1 'cpu cores' <<< "$cpuinfo" |
+		cut -d ':' -f 2 |
+		sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+	)"
+	cpu_msg="CPU: $(randomcolor)${cpu_model} ${cpu_cores}-core processor"
+	cpu_msg+="${COLOR_NC}"
+	echo -e "$cpu_msg"
+	# TODO: simplify memory calculation, color-code free memory,
+	#       show more human-readable numbers
+	free_memory="$(
+		grep 'MemFree' < /proc/meminfo |
+		sed -r -e 's/^.+ ([[:digit:]]+.+)$/\1/'
+	)"
+	total_memory="$(
+		grep 'MemTotal' < /proc/meminfo |
+		sed -r -e 's/^.+ ([[:digit:]]+.+)$/\1/'
+	)"
+	mem_msg="Memory: ${COLOR_BYellow}${free_memory}${COLOR_NC}/${COLOR_BGreen}"
+	mem_msg+="${total_memory}${COLOR_NC} available"
+	echo -e "$mem_msg"
+	echo
+
+	# Print fortune, if avialable
+	if type fortune &>/dev/null; then
+		fortune -s
+	fi
 }
 
 # Runs software checks and pulls .dotfiles repo if branch is master
@@ -660,12 +741,7 @@ if ! ssh-add -l > /dev/null; then
 fi
 
 # echo motd
-echo -e "$(randomcolor)This is BASH" \
-        "$(randomcolor)${BASH_VERSION%.*}${COLOR_NC}\n"
-date && echo
-if command -v fortune >/dev/null; then
-	fortune -s	# Makes the day a bit more fun :)
-fi
+motd
 
 # move to bash start dir
 cd "$bash_start_dir" ||
