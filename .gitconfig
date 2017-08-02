@@ -5,7 +5,7 @@
 
 [alias]
 	alias = config --get-regexp ^alias\\.
-	pullr = pull --rebase
+	pullr = !git pull --rebase && git submodule update --recursive
 [color]
 	branch = auto
 	diff = auto
