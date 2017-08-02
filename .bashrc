@@ -589,7 +589,7 @@ function motd {
 	echo -e "$uptime_msg"
 	echo
 
-	# Print CPU and Memory info
+	# Print CPU, memory, and HDD info
 	cpuinfo="$(cat /proc/cpuinfo)"
 	cpu_model="$(
 		grep -m 1 'model name' <<< "$cpuinfo" |
@@ -617,6 +617,8 @@ function motd {
 	mem_msg="Memory: ${COLOR_BYellow}${free_memory}${COLOR_NC}/${COLOR_BGreen}"
 	mem_msg+="${total_memory}${COLOR_NC} available"
 	echo -e "$mem_msg"
+	echo 'HDDs:'
+	echo -en "$(randomcolor)" && df -mh && echo -en "${COLOR_NC}"
 	echo
 
 	# Print fortune, if avialable
