@@ -566,7 +566,11 @@ function randomcolor {
 # Prints the message of the day (time, shell info, system info, etc.)
 function motd {
 	local kernel_string uptime_seconds uptime_msg cpuinfo cpu_model cpu_cores \
-	      cpu_msg free_memory total_memory mem_msg
+	      cpu_msg k mem_decimals mem_units mem_label mem_percent_free \
+	      mem_danger_cutoff_limit mem_danger_cutoff_percent \
+	      mem_warning_cutoff_limit mem_warning_cutoff_percent mem_free_color \
+	      mem_msg
+	local -A memory
 
 	# Print shell info
 	echo -e "$(randomcolor)This is BASH" \
@@ -604,18 +608,68 @@ function motd {
 	cpu_msg="CPU: $(randomcolor)${cpu_model} ${cpu_cores}-core processor"
 	cpu_msg+="${COLOR_NC}"
 	echo -e "$cpu_msg"
-	# TODO: simplify memory calculation, color-code free memory,
-	#       show more human-readable numbers
-	free_memory="$(
-		grep 'MemFree' < /proc/meminfo |
-		sed -r -e 's/^.+ ([[:digit:]]+.+)$/\1/'
+	memory['free']='MemFree'
+	memory['total']='MemTotal'
+	for k in "${!memory[@]}"; do
+		memory["$k"]="$(
+			grep "${memory["$k"]}" < /proc/meminfo |
+			sed -r -e 's/^.+ ([[:digit:]]+).+$/\1/'
+		)"
+		(( memory["$k"] *= 1024 ))
+	done
+	# Determine memory divisor by available memory
+	mem_decimals=2
+	if [ "${memory['free']}" -gt $(( 1024 * 1024 * 1024 )) ]; then
+		mem_units=$(( 1024 * 1024 * 1024 ))
+		mem_label='GiB'
+	elif [ "${memory['free']}" -gt $(( 1024 * 1024 )) ]; then
+		mem_units=$(( 1024 * 1024 ))
+		mem_label='MiB'
+	elif [ "${memory['free']}" -gt 1024 ]; then
+		mem_decimals=1
+		mem_units=1024
+		mem_label='KiB'
+	else
+		mem_decimals=0
+		mem_units=1
+		mem_label='B'
+	fi
+	# Determine memory "safety" by comparing available-to-total memory
+	# and by the following hard cutoffs for available memory:
+	#  - available < 100mb or available / total < 0.1 :: danger
+	#  - 100mb < available < 300mb or available / total < 0.3 :: warning
+	mem_percent_free="$(
+		awk -v free="${memory['free']}" -v total="${memory['total']}" \
+			'BEGIN { print free / total }'
 	)"
-	total_memory="$(
-		grep 'MemTotal' < /proc/meminfo |
-		sed -r -e 's/^.+ ([[:digit:]]+.+)$/\1/'
-	)"
-	mem_msg="Memory: ${COLOR_BYellow}${free_memory}${COLOR_NC}/${COLOR_BGreen}"
-	mem_msg+="${total_memory}${COLOR_NC} available"
+	mem_danger_cutoff_limit="$(( 100 * 1024 * 1024 ))"
+	mem_danger_cutoff_percent='0.1'
+	mem_warning_cutoff_limit="$(( 300 * 1024 * 1024 ))"
+	mem_warning_cutoff_percent='0.3'
+	if (
+		[ "${memory['free']}" -lt "$mem_danger_cutoff_limit" ] ||
+		echo "$mem_percent_free" "$mem_danger_cutoff_percent" | \
+			awk '{exit $1 < $2 ? 0 : 1}'
+	); then
+		mem_free_color="${COLOR_BRed}"
+	elif (
+		[ "${memory['free']}" -lt "$mem_warning_cutoff_limit" ] ||
+		echo "$mem_percent_free" "$mem_warning_cutoff_percent" | \
+			awk '{exit $1 < $2 ? 0 : 1}'
+	); then
+		mem_free_color="${COLOR_BYellow}"
+	else
+		mem_free_color="${COLOR_BGreen}"
+	fi
+	# Format memory display
+	for k in "${!memory[@]}"; do
+		memory["$k"]="$(
+			awk -v m="${memory["$k"]}" -v u="$mem_units" -v d="$mem_decimals" \
+				'BEGIN { printf "%.*f", d, m / u }'
+		)"
+	done
+	mem_msg="Memory: ${mem_free_color}${memory['free']}${COLOR_NC}/"
+	mem_msg+="${COLOR_BWhite}${memory['total']}${COLOR_NC} ${mem_label} available"
 	echo -e "$mem_msg"
 	echo 'HDDs:'
 	echo -en "$(randomcolor)" && df -mh && echo -en "${COLOR_NC}"
