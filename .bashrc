@@ -684,6 +684,9 @@ function motd {
 # Runs software checks and pulls .dotfiles repo if branch is master
 function software-and-bashrc-check {
 	local dotfiles_update_output
+	if [ ! -d ~/bin ]; then
+		mkdir ~/bin
+	fi
 	jq-check
 	git-for-windows-check
 	python-check
