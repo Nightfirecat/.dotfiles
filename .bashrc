@@ -195,7 +195,7 @@ fi
 # start ssh, only prompting for password on new ssh-agent creation
 # (http://unix.stackexchange.com/a/217223/136537)
 function ssh-setup {
-	local loaded_idents
+	local loaded_idents file
 	if [ ! -S ~/.ssh/ssh_auth_sock ]; then
 		eval "$(ssh-agent)"
 		ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
@@ -574,7 +574,7 @@ function motd {
 
 	# Print shell info
 	echo -e "$(randomcolor)This is BASH" \
-			"$(randomcolor)${BASH_VERSION%.*}${COLOR_NC}"
+	        "$(randomcolor)${BASH_VERSION%.*}${COLOR_NC}"
 	kernel_string="$(
 		(
 			uname -s
@@ -700,8 +700,6 @@ function software-and-bashrc-check {
 # exit function
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
 function _exit {
-	# for some reason, this doesn't respect our alias...
-	# must explicitly add `-e` flag for colors to be shown
 	echo -e "$(randomcolor)Bye!${COLOR_NC}"
 	sleep 0.5
 }
@@ -757,7 +755,7 @@ function .complete {
 		return 1
 	fi
 
-	local parent_depth path_array parent_path
+	local parent_depth path_array i parent_path
 	parent_depth="${cmd//.}"
 	if [[ -z "$parent_depth" ]]; then
 		parent_depth=1
