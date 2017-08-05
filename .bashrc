@@ -799,11 +799,20 @@ fi
 # echo motd
 motd
 
-# move to bash start dir
-cd "$HOME" ||
-  (
-	  echo "Bash start dir '${HOME}' could not be found!" &&
-	  exit 1
-  )
+# Move to bash start dir
+# On Windows, only do so if the starting dir does not appear to be set from
+# the "Git Bash Here" context menu option
+if (
+	(
+		uname -s | grep -q 'MINGW' && [ "$(pwd)" = '/' ]
+	) ||
+	! uname -s | grep -q 'MINGW'
+); then
+	cd "$HOME" ||
+		(
+			echo "Bash start dir '${HOME}' could not be found!" &&
+			exit 1
+		)
+fi
 
 software-and-bashrc-check
