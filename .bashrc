@@ -44,12 +44,11 @@ shopt -u nullglob	# `ls nonexist/*` should fail, not act like `ls`
 ### variables
 
 # dirs
-bash_start_dir="$HOME"
 bash_util_dir=~/.bashrc_util
 
 # function globals
 gh_oauth_file="${bash_util_dir}/github-oauth"
-if [[ -f "$gh_oauth_file" && $(wc -l < "$gh_oauth_file") == 2 ]]; then
+if [[ -f "$gh_oauth_file" && $(wc -l < "$gh_oauth_file") = 2 ]]; then
 	gh_oauth_frag="?client_id=$(head -n 1 "$gh_oauth_file")&client_secret="
 	gh_oauth_frag+="$(tail -n 1 "$gh_oauth_file")"
 else
@@ -207,7 +206,7 @@ function ssh-setup {
 	# runs grep quietly for neatness
 	loaded_idents="$(ssh-add -l)"
 	for file in ~/.ssh/* ; do
-		if [[ -f "$file" ]] && \
+		if [ -f "$file" ] && \
 		grep -q -- '-BEGIN RSA PRIVATE KEY-' "$file" && \
 		! grep -q "$file" <<< "$loaded_idents";
 		then
@@ -512,7 +511,7 @@ function python-check {
 		return_val=2
 	fi
 
-	[[ ! -z "$error" ]] && {
+	[ ! -z "$error" ] && {
 		echo -e "$error"
 		echo "Download python or python3 here: $python_download_url"
 	} >&2
@@ -691,11 +690,11 @@ function software-and-bashrc-check {
 	git-for-windows-check
 	python-check
 	dotfiles_update_output="$(
-		cd "$bash_start_dir" &&
-		[[ "$(git symbolic-ref --short HEAD)" == 'master' ]] &&
+		cd "$HOME" &&
+		[ "$(git symbolic-ref --short HEAD)" = 'master' ] &&
 		git pull --ff-only
 	)"
-	if [[ "$dotfiles_update_output" != 'Already up-to-date.' ]]; then
+	if [ "$dotfiles_update_output" != 'Already up-to-date.' ]; then
 		echo "$dotfiles_update_output"
 	fi
 }
@@ -760,7 +759,7 @@ function .complete {
 
 	local parent_depth path_array i parent_path
 	parent_depth="${cmd//.}"
-	if [[ -z "$parent_depth" ]]; then
+	if [ -z "$parent_depth" ]; then
 		parent_depth=1
 	fi
 	path_array=()
@@ -801,9 +800,9 @@ fi
 motd
 
 # move to bash start dir
-cd "$bash_start_dir" ||
+cd "$HOME" ||
   (
-	  echo "Bash start dir '${bash_start_dir}' could not be found!" &&
+	  echo "Bash start dir '${HOME}' could not be found!" &&
 	  exit 1
   )
 
