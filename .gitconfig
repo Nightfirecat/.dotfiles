@@ -15,6 +15,7 @@
 [core]
 	autocrlf = false
 	fscache = true
+	longpaths = true
 	pager = less -x1,5
 	symlinks = false
 	whitespace = cr-at-eol,tabwidth=4,trailing-space
