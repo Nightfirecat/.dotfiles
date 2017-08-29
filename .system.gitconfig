@@ -7,6 +7,11 @@
 	autocrlf = true
 	fscache = true
 	symlinks = false
+# If a program such as GPG4win is installed, this entry will instruct Git to
+# use its binary as a GPG agent, since Git for Windows bash does not contain
+# a `gpg-agent` binary
+#[gpg]
+#	program = "D:/Program Files (x86)/GNU/GnuPG/gpg2.exe"
 [sendemail]
 	smtpserver = /bin/msmtp.exe
 [user]
