@@ -371,6 +371,13 @@ function join_by {
 	printf '%s' "${@/#/$d}"
 }
 
+# Attempts to reach $gh_api_base_url
+# Returns 0 if successful, or CURL error code if failed
+function github-connectivity-check {
+	curl -sf "$gh_api_base_url" &>/dev/null
+	return "$?"
+}
+
 # Compact wrapper function for GitHub API calls
 # Prints API response for a given path, using available OAuth credentials
 # if available.
@@ -686,9 +693,14 @@ function software-and-bashrc-check {
 	if [ ! -d ~/bin ]; then
 		mkdir ~/bin
 	fi
-	jq-check
-	git-for-windows-check
-	python-check
+	if github-connectivity-check; then
+		jq-check
+		git-for-windows-check
+		python-check
+	else
+		echo -e "${COLOR_ALERT}Could not connect to GitHub's API!${COLOR_NC}"
+		echo    "Skipping software checks depending on it..."
+	fi
 	dotfiles_update_output="$(
 		cd "$HOME" &&
 		[ "$(git symbolic-ref --short HEAD)" = 'master' ] &&
