@@ -89,7 +89,7 @@ export COLOR_On_Cyan='\e[46m'	# Equivalent to COLOR_Cyan
 export COLOR_On_White='\e[47m'	# Equivalent to COLOR_White
 
 # Color Reset
-export COLOR_NC="\e[m"
+export COLOR_NC='\e[m'
 
 # Alert color (bold white on red background)
 export COLOR_ALERT="${COLOR_BWhite}${COLOR_On_Red}"
@@ -228,9 +228,9 @@ function colortest {
 	           '  32m' '1;32m' '  33m' '1;33m' '  34m' '1;34m' \
 	           '  35m' '1;35m' '  36m' '1;36m' '  37m' '1;37m';
 		do FG=${FGs// /}
-		echo -en " $FGs \033[$FG  $T  "
+		echo -en " $FGs \\033[$FG  $T  "
 		for BG in 40m 41m 42m 43m 44m 45m 46m 47m;
-			do echo -en "$EINS \033[$FG\033[$BG  $T  \033[0m";
+			do echo -en "$EINS \\033[$FG\\033[$BG  $T  \\033[0m";
 		done
 		echo
 	done
@@ -502,9 +502,9 @@ function python-check {
 	   ! type python3 &>/dev/null;
 	then
 		! type python &>/dev/null &&
-		  error+="Python2 is missing!\n"
+		  error+="Python2 is missing!\\n"
 		! type python3 &>/dev/null &&
-		  error+="Python3 is missing!\n"
+		  error+="Python3 is missing!\\n"
 		return_val=1
 	fi
 	if [ "$return_val" -eq 0 ] && (
@@ -512,9 +512,9 @@ function python-check {
 	   ! python3 --version 2>&1 | grep -q ' 3.'
 	); then
 		! python --version 2>&1 | grep -q ' 2.' &&
-		  error+="${COLOR_Yellow}python${COLOR_NC} is not Python2!\n"
+		  error+="${COLOR_Yellow}python${COLOR_NC} is not Python2!\\n"
 		! python3 --version 2>&1 | grep -q ' 3.' &&
-		  error+="${COLOR_Yellow}python3${COLOR_NC} is not Python3!\n"
+		  error+="${COLOR_Yellow}python3${COLOR_NC} is not Python3!\\n"
 		return_val=2
 	fi
 
@@ -587,7 +587,7 @@ function motd {
 			uname -r
 			uname -m
 			uname -o
-		) | tr "\n" ' '
+		) | tr "\\n" ' '
 	)"
 	echo -e "This kernel is: $(randomcolor)${kernel_string}${COLOR_NC}"
 
@@ -783,7 +783,7 @@ function .complete {
 	COMPREPLY=(
 		$(
 			compgen -W "$(
-				printf "%s\n" "$parent_path"/*/ |
+				printf "%s\\n" "$parent_path"/*/ |
 				sed -e 's|^\(../\)*||'
 			)" -- "$word"
 		)
