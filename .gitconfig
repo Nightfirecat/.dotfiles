@@ -5,6 +5,11 @@
 
 [alias]
 	alias = config --get-regexp ^alias\\.
+	ll = log --pretty=format:"%C(yellow)%h%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --numstat
+	lo = log --oneline --decorate
+	ls = log --pretty=format:"%C(yellow)%h%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate
+	lsd = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --date=short
+	lsdr = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --date=relative
 	pullf = !git pull --ff-only && git submodule update --recursive
 	pullr = !git pull --rebase && git submodule update --recursive
 [color]
