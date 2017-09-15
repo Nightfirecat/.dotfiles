@@ -769,7 +769,7 @@ function .complete {
 		return 1
 	fi
 
-	local parent_depth path_array i parent_path
+	local parent_depth path_array i parent_path word_list matched_word
 	parent_depth="${cmd//.}"
 	if [ -z "$parent_depth" ]; then
 		parent_depth=1
@@ -780,14 +780,16 @@ function .complete {
 	done
 	parent_path="$(join_by '/' "${path_array[@]}")"
 
-	COMPREPLY=(
-		$(
-			compgen -W "$(
-				printf "%s\\n" "$parent_path"/*/ |
-				sed -e 's|^\(../\)*||'
-			)" -- "$word"
-		)
-	)
+  COMPREPLY=()
+  word_list="$(
+    printf "%s\\n" "$parent_path"/*/ |
+    sed -e 's|^\(../\)*||' -e 's| |\\ |g'
+  )"
+  while IFS='' read -r matched_word; do
+    if [[ "$matched_word" =~ ^$word ]]; then
+      COMPREPLY+=( "$matched_word" )
+    fi
+  done <<< "$word_list"
 }
 
 complete -F .complete .. .1 .2 .3 .4 .5 .6 .7 .8 .9
