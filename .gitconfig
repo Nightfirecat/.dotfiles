@@ -10,8 +10,11 @@
 	ls = log --pretty=format:"%C(yellow)%h%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate
 	lsd = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --date=short
 	lsdr = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --date=relative
-	pullf = !git pull --ff-only && git submodule update --recursive
-	pullr = !git pull --rebase && git submodule update --recursive
+	pullf = pull --ff-only
+	pullfsu = !git pull --ff-only && git submodule update --recursive
+	pullr = pull --rebase
+	pullrsu = !git pull --rebase && git submodule update --recursive
+	su = submodule update --recursive
 [color]
 	branch = auto
 	diff = auto
