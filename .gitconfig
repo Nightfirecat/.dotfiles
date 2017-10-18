@@ -13,7 +13,9 @@
 	pullf = pull --ff-only
 	pullfsu = !git pull --ff-only && git submodule update --recursive
 	pullr = pull --rebase
+	pullrp = !git pull --rebase && git push
 	pullrsu = !git pull --rebase && git submodule update --recursive
+	pullrsup = !git pull --rebase && git submodule update --recursive && git push
 	su = submodule update --recursive
 [color]
 	branch = auto
