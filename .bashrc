@@ -148,12 +148,6 @@ alias lr='ll -R'	# recursive ls
 alias la='ll -A'	# show hidden files
 alias tree='tree -Csuh'	# nice alternative to recursive `ls`
 
-# Ensure `xdg-open` exists for opening web browser pages
-if ! type xdg-open &>/dev/null; then
-	alias xdg-open='python -m webbrowser'
-fi
-
-
 ## tailoring less
 #export PAGER=less
 #export LESSCHARSET='latin1'
