@@ -27,22 +27,24 @@ function np {
 # Ensure `xdg-open` exists for opening web browser pages
 if ! type xdg-open &>/dev/null; then
   echo 'defining xdg-open'
-  # TODO: add check for `python` and `python -m webbrowser`
   function xdg-open {
     if [ "$#" != 1 ]; then
       echo "Usage: ${FUNCNAME[0]} url"
     fi
+    if ! python -h &>/dev/null; then
+      echo 'No python installation found!'
+      echo 'Python required for webbrowser module on Windows'
+    fi
 
     local url
-    if ! [[ "$1" =~ .+://.+ ]]; then
+    if [[ "$1" =~ .+://.+ ]]; then
+      url="$1"
+    else
       if [ -f "$1" ]; then
-        # TODO: troubleshoot
-        url="file://$(cygpath $(realpath $1))"
+        url="file://$(cygpath -m $(realpath $1))"
       else
         url="http://$1"
       fi
-    else
-      url="$1"
     fi
     python -m webbrowser "$url"
   }
