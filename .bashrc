@@ -159,7 +159,7 @@ fi
 #export LESSCHARSET='latin1'
 #export LESSOPEN='|/usr/bin/lesspipe.sh %s 2>&-'
 #                # Use this if lesspipe.sh exists.
-#export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \
+#export LESS='-i -N -w -z-4 -g -e -M -X -F -R -P%t?f%f \
 #:stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
 #
 #LESS man page colors (makes Man pages more readable).
@@ -473,15 +473,15 @@ function git-for-windows-check {
 			jq -r '.tag_name' <<< "$git_for_windows_api_resp"
 		)"
 		if [ "$current_git_version" != "$latest_git_version" ]; then
-		  latest_git_release_page="$(
-			jq -r '.html_url' <<< "$git_for_windows_api_resp"
-		  )"
-		  echo -e "${COLOR_ALERT}Your version of Git for Windows" \
-				  "(${current_git_version}) is out of date!${COLOR_NC}"
-		  echo -e "The latest version (${latest_git_version})" \
-				  'can be downloaded here:'
-		  echo -e "  ${COLOR_BGreen}${latest_git_release_page}${COLOR_NC}"
-		  echo
+			latest_git_release_page="$(
+				jq -r '.html_url' <<< "$git_for_windows_api_resp"
+			)"
+			echo -e "${COLOR_ALERT}Your version of Git for Windows" \
+			        "(${current_git_version}) is out of date!${COLOR_NC}"
+			echo -e "The latest version (${latest_git_version})" \
+			        'can be downloaded here:'
+			echo -e "  ${COLOR_BGreen}${latest_git_release_page}${COLOR_NC}"
+			echo
 		fi
 	fi
 }
@@ -699,7 +699,7 @@ function software-and-bashrc-check {
 		python-check
 	else
 		echo -e "${COLOR_ALERT}Could not connect to GitHub's API!${COLOR_NC}"
-		echo    "Skipping software checks depending on it..."
+		echo    'Skipping software checks depending on it...'
 	fi
 	dotfiles_update_output="$(
 		cd "$HOME" &&
@@ -722,7 +722,7 @@ trap _exit EXIT
 
 # programmable completion
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
-if [ "$(cut -d '.' -f '1' <<< "$BASH_VERSION")"  -lt "3" ]; then
+if [ "$(cut -d '.' -f '1' <<< "$BASH_VERSION")" -lt 3 ]; then
 	echo 'You will need to upgrade to version 3.0 for full' \
 	     'programmable completion features'
 	return
@@ -780,16 +780,16 @@ function .complete {
 	done
 	parent_path="$(join_by '/' "${path_array[@]}")"
 
-  COMPREPLY=()
-  word_list="$(
-    printf "%s\\n" "$parent_path"/*/ |
-    sed -e 's|^\(../\)*||' -e 's| |\\ |g'
-  )"
-  while IFS='' read -r matched_word; do
-    if [[ "$matched_word" =~ ^$word ]]; then
-      COMPREPLY+=( "$matched_word" )
-    fi
-  done <<< "$word_list"
+	COMPREPLY=()
+	word_list="$(
+		printf "%s\\n" "$parent_path"/*/ |
+		sed -e 's|^\(../\)*||' -e 's| |\\ |g'
+	)"
+	while IFS='' read -r matched_word; do
+		if [[ "$matched_word" =~ ^$word ]]; then
+		COMPREPLY+=( "$matched_word" )
+	fi
+	done <<< "$word_list"
 }
 
 complete -F .complete .. .1 .2 .3 .4 .5 .6 .7 .8 .9
