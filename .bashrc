@@ -711,6 +711,36 @@ function software-and-bashrc-check {
 	fi
 }
 
+# Prints color sequence according to the token type passed
+# Prints red if user is root
+function _ps1_color {
+	if [ $# -ne 1 ]; then return; fi
+	local color
+
+	if [ "$1" = 'prompt' ]; then
+		# process this before root check so typed text is not colored
+		color="${COLOR_NC}"
+	elif [ "$EUID" -eq 0 ]; then
+		# this user is root, color the prompt red!
+		color="${COLOR_Red}"
+	elif [ "$1" = 'bracket' ]; then
+		color="${COLOR_White}"
+	elif [ "$1" = 'user' ]; then
+		color="${COLOR_Green}"
+	elif [ "$1" = '@' ]; then
+		color="${COLOR_Red}"
+	elif [ "$1" = 'host' ]; then
+		color="${COLOR_Green}"
+	elif [ "$1" = 'path' ]; then
+		color="${COLOR_Yellow}"
+	elif [ "$1" = 'branch' ]; then
+		color="${COLOR_Cyan}"
+	elif [ "$1" = '$' ]; then
+		color="${COLOR_BWhite}"
+	fi
+	echo -e "$color"
+}
+
 # exit function
 # (http://tldp.org/LDP/abs/html/sample-bashrc.html)
 function _exit {
@@ -830,3 +860,11 @@ if (
 fi
 
 software-and-bashrc-check
+
+# Custom window title and PS1
+# window title is $PWD; $?=#
+# PS1 is [user@host path] (git branch) $
+# All non-printing sequences must be surrounded by \[ \]
+# can only use variables where marked below (functions cause errors in title)
+#                     vvvv
+export PS1="\\[\\e]0;\$PWD; \\\$?=\$?\\007\\]\\n\\[\$(_ps1_color bracket)\\][\\[\$(_ps1_color user)\\]\\u\\[\$(_ps1_color @)\\]@\\[\$(_ps1_color host)\\]\\[\$(hostname -f 2>/dev/null || hostname)\\] \\[\$(_ps1_color path)\\]\\w\\[\$(_ps1_color bracket)\\]]\\[\$(_ps1_color branch)\\]\\[\$(__git_ps1 2>/dev/null)\\]\\[\$(_ps1_color \\$)\\] \\$\\[\$(_ps1_color prompt)\\] "
