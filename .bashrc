@@ -736,7 +736,7 @@ function _ps1_color {
 	elif [ "$1" = 'branch' ]; then
 		color="${COLOR_Cyan}"
 	elif [ "$1" = '$' ]; then
-		color="${COLOR_BWhite}"
+		color="${COLOR_White}"
 	fi
 	echo -e "$color"
 }
@@ -867,4 +867,5 @@ software-and-bashrc-check
 # All non-printing sequences must be surrounded by \[ \]
 # can only use variables where marked below (functions cause errors in title)
 #                     vvvv
-export PS1="\\[\\e]0;\$PWD; \\\$?=\$?\\007\\]\\n\\[\$(_ps1_color bracket)\\][\\[\$(_ps1_color user)\\]\\u\\[\$(_ps1_color @)\\]@\\[\$(_ps1_color host)\\]\\[\$(hostname -f 2>/dev/null || hostname)\\] \\[\$(_ps1_color path)\\]\\w\\[\$(_ps1_color bracket)\\]]\\[\$(_ps1_color branch)\\]\\[\$(__git_ps1 2>/dev/null)\\]\\[\$(_ps1_color \\$)\\] \\$\\[\$(_ps1_color prompt)\\] "
+export PS1="\\[\\e]0;\$PWD; \\\$?=\$?\\007\\]\\n\\[\$(_ps1_color bracket)\\][\\[\$(_ps1_color user)\\]\\u\\[\$(_ps1_color @)\\]@\\[\$(_ps1_color host)\\]\\[\$(hostname -f 2>/dev/null || hostname)\\] \\[\$(_ps1_color path)\\]\\w\\[\$(_ps1_color bracket)\\]]\\[\$(_ps1_color branch)\\]\\[\$(__git_ps1 2>/dev/null)\\]\\[\$(_ps1_color \\$)\\]
+\\$\\[\$(_ps1_color prompt)\\] "
