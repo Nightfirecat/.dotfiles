@@ -4,7 +4,7 @@
 ###   * http://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
 
 # If not running interactively, don't do anything
-[ -z "$PS1" ] && return
+[ -z "$PS1" ] && exit
 
 # source global definitions (if any)
 if [ -f /etc/bashrc ]; then
