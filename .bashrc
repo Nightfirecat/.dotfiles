@@ -707,7 +707,8 @@ function software-and-bashrc-check {
 		[ "$(git symbolic-ref --short HEAD)" = 'master' ] &&
 		git pull --ff-only
 	)"
-	if [ "$dotfiles_update_output" != 'Already up-to-date.' ]; then
+	if [ "$dotfiles_update_output" != 'Already up-to-date.' -a \
+	     "$dotfiles_update_output" != 'Already up to date.']; then
 		echo "$dotfiles_update_output"
 	fi
 }
