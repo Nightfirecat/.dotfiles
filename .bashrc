@@ -461,10 +461,11 @@ function git-for-windows-check {
 		  latest_git_version latest_git_release_page
 		git_href_frag='repos/git-for-windows/git/releases/latest'
 		git_for_windows_api_resp="$(query_github_api "$git_href_frag")" ||
-			echo \
-			  'GitHub API rate limit reached, skipping git-for-windows check' \
-			  >&2 &&
-			return 1
+			(
+				echo 'GitHub API rate limit reached,' \
+				    'skipping git-for-windows check' >&2 &&
+				return 1
+			)
 		current_git_version="$(
 			git --version |
 			sed 's/git version */v/'
