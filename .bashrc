@@ -454,39 +454,6 @@ function jq-check {
 	fi
 }
 
-# checks for Git for Windows updates (does not run in Cygwin/Linux)
-function git-for-windows-check {
-	if uname -s | grep -q 'MINGW'; then
-		local git_href_frag git_for_windows_api_resp current_git_version \
-		  latest_git_version latest_git_release_page
-		git_href_frag='repos/git-for-windows/git/releases/latest'
-		git_for_windows_api_resp="$(query_github_api "$git_href_frag")" ||
-			(
-				echo 'GitHub API rate limit reached,' \
-				    'skipping git-for-windows check' >&2 &&
-				return 1
-			)
-		current_git_version="$(
-			git --version |
-			sed 's/git version */v/'
-		)"
-		latest_git_version="$(
-			jq -r '.tag_name' <<< "$git_for_windows_api_resp"
-		)"
-		if [ "$current_git_version" != "$latest_git_version" ]; then
-			latest_git_release_page="$(
-				jq -r '.html_url' <<< "$git_for_windows_api_resp"
-			)"
-			echo -e "${COLOR_ALERT}Your version of Git for Windows" \
-			        "(${current_git_version}) is out of date!${COLOR_NC}"
-			echo -e "The latest version (${latest_git_version})" \
-			        'can be downloaded here:'
-			echo -e "  ${COLOR_BGreen}${latest_git_release_page}${COLOR_NC}"
-			echo
-		fi
-	fi
-}
-
 # Checks to ensure Python2 (python) and Python3 (python3) are installed, and
 # are of the correct versions (python =/= Python3)
 # Returns 1 if python or python3 are absent
@@ -696,7 +663,6 @@ function software-and-bashrc-check {
 	fi
 	if github-connectivity-check; then
 		jq-check
-		git-for-windows-check
 		python-check
 	else
 		echo -e "${COLOR_ALERT}Could not connect to GitHub's API!${COLOR_NC}"
