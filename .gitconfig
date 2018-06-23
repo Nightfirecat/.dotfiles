@@ -43,3 +43,5 @@
 [user]
 	name = Jordan Atwood
 	email = jordan.atwood423@gmail.com
+[winUpdater]
+	recentlySeenVersion = 2.18.0.windows.1
