@@ -1,0 +1,17 @@
+# This file controls the behavior of line input editing for programs that use
+# the GNU Readline library. Existing programs include FTP, Bash, and GDB.
+#
+# You can re-read the inputrc file with C-x C-r.
+# Lines beginning with '#' are comments.
+
+
+# First, include any system-wide bindings and variable assignments
+# from /etc/Inputrc
+$include /etc/Inputrc
+
+# Add history searching. That is, map the up and down arrow keys to search for
+# completions from the current line from command history.
+# eg. If "git" is typed, hitting UP will move to the most recent "git" command
+#     in history
+"\e[A": history-search-backward
+"\e[B": history-search-forward
