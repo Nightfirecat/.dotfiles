@@ -10,4 +10,4 @@
 --hidden
 
 # Don't search .git directories
---iglob='.git'
+--glob=!.git
