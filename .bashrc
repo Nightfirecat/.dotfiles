@@ -94,6 +94,10 @@ export COLOR_NC='\e[m'
 # Alert color (bold white on red background)
 export COLOR_ALERT="${COLOR_BWhite}${COLOR_On_Red}"
 
+### vars for other programs
+
+export RIPGREP_CONFIG_PATH=~/.ripgreprc
+
 
 ### scripts
 

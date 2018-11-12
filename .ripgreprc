@@ -1,0 +1,13 @@
+# https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md#configuration-file
+
+# Limit output width
+--max-columns=150
+
+# Print Unix-style paths
+--path-separator=/
+
+# Search hidden files and directories
+--hidden
+
+# Don't search .git directories
+--iglob='.git'
