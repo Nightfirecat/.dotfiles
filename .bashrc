@@ -378,7 +378,7 @@ function join_by {
 # Attempts to reach $gh_api_base_url
 # Returns 0 if successful, or CURL error code if failed
 function github-connectivity-check {
-	curl -sf "${gh_api_base_url}/rate_limit" &>/dev/null
+	curl -sf "${gh_api_base_url}/rate_limit" | tac &>/dev/null
 	return "$?"
 }
 
