@@ -509,9 +509,9 @@ function displaytime {
 	S=$((T%60))
 	[ "$D" -gt 0 ] &&
 		echo -n "${D}d "
-	([ "$D" -gt 0 ] || [ "$H" -gt 0 ]) &&
+	{ [ "$D" -gt 0 ] || [ "$H" -gt 0 ]; } &&
 		printf '%02.0fh ' "$H"
-	([ "$D" -gt 0 ] || [ "$H" -gt 0 ] || [ "$M" -gt 0 ]) &&
+	{ [ "$D" -gt 0 ] || [ "$H" -gt 0 ] || [ "$M" -gt 0 ]; } &&
 		printf '%02.0fm ' "$M"
 	printf '%02.0fs' "$S"
 }
