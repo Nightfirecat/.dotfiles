@@ -5,11 +5,11 @@
 
 [alias]
 	alias = !git config --get-regexp '^alias\\.' | cut -d '.' -f '2-' | sed -re 's/^([^ ]+) /\\1\\t/g' | column -s $'\\t' -t | sort
-	ll = log --pretty=format:"%C(yellow)%h%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --numstat
+	ll = log --pretty=format:"%C(yellow)%h%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%aN]%C(reset)" --decorate --numstat
 	lo = log --oneline --decorate
-	ls = log --pretty=format:"%C(yellow)%h%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate
-	lsd = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --date=short
-	lsdr = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%cn]%C(reset)" --decorate --date=relative
+	ls = log --pretty=format:"%C(yellow)%h%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%aN]%C(reset)" --decorate
+	lsd = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%aN]%C(reset)" --decorate --date=short
+	lsdr = log --pretty=format:"%C(yellow)%h\\ %ad%C(red)%d%C(reset)\\ %s\\ %C(blue)%C(bold)[%aN]%C(reset)" --decorate --date=relative
 	pullf = pull --ff-only
 	pullfsur = !git pull --ff-only && git submodule update --recursive
 	pullr = pull --rebase
