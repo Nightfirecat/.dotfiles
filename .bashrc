@@ -211,7 +211,7 @@ function ssh-setup {
 	loaded_idents="$(ssh-add -l)"
 	for file in ~/.ssh/* ; do
 		if [ -f "$file" ] && \
-		grep -q -- '-BEGIN RSA PRIVATE KEY-' "$file" && \
+		grep -E -q -- '-BEGIN (OPENSSH|RSA) PRIVATE KEY-' "$file" && \
 		! grep -q "$file" <<< "$loaded_idents";
 		then
 			ssh-add "$file"
